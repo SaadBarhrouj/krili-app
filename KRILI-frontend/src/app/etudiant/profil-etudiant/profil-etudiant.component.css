@@ -1,0 +1,704 @@
+/* Fichier CSS pour profil-etudiant inspiré du style du profil de propriétaire */
+:host {
+  display: block;
+  --card-radius: 1rem;
+  --transition-speed: 0.3s;
+  --transition-function: cubic-bezier(0.4, 0, 0.2, 1);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.12);
+  --shadow-hover: 0 22px 40px rgba(0, 0, 0, 0.1); 
+  --primary-gradient: linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%);
+  --accent-gradient: linear-gradient(135deg, #6366F1 0%, #A5B4FC 100%);
+  --card-hover-transform: translateY(-8px);
+  --border-radius-sm: 0.5rem;
+  --border-radius-md: 0.75rem;
+  --border-radius-lg: 1.25rem;
+  --border-radius-xl: 2rem;
+  --primary-rgb: 37, 99, 235; /* Valeur RGB pour --primary */
+}
+
+/* General Styles */
+body {
+  font-family: 'Arial', sans-serif; /* Example: Using a common sans-serif font */
+  color: #333; /* Darker base text color for better contrast */
+}
+
+.profile-page-container {
+  padding: 20px;
+  background-color: #f9f9f9; /* Light background for the page container */
+}
+
+.page-header h1 {
+  font-size: 2em; /* Larger font size for the main page title */
+  color: #1a202c; /* Darker color for heading */
+  margin-bottom: 0.5em;
+}
+
+.page-header p {
+  font-size: 1.1em; /* Slightly larger paragraph text */
+  color: #4a5568; /* Softer color for subheading */
+  margin-bottom: 1.5em;
+}
+
+/* Container principal du profil étudiant */
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  min-height: calc(100vh - 200px);
+  position: relative;
+  z-index: 1;
+}
+
+/* Animation de chargement améliorée */
+.spinner-border.text-primary {
+  width: 3rem;
+  height: 3rem;
+  border-width: 0.3rem;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Messages d'alerte stylisés */
+.alert {
+  border-radius: var(--border-radius-md);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  border: none;
+  box-shadow: var(--shadow-sm);
+  font-weight: 500;
+}
+
+.alert-success {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #065f46;
+  border-left: 4px solid #10b981;
+}
+
+.alert-danger {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #b91c1c;
+  border-left: 4px solid #ef4444;
+}
+
+.alert-info {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #1e40af;
+  border-left: 4px solid #3b82f6;
+}
+
+/* Amélioration de la carte principale */
+.card {
+  border: none;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  transition: box-shadow var(--transition-speed) var(--transition-function);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+/* En-tête de carte avec gradient */
+.card-header {
+  background: var(--primary-gradient) !important;
+  border-bottom: none;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-header::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  right: -10px;
+  width: 100px;
+  height: 100px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.card-header h2 {
+  position: relative;
+  z-index: 1;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+/* Corps de carte avec espacement amélioré */
+.card-body {
+  padding: 2rem;
+  background-color: white;
+}
+
+/* Avatar de l'étudiant */
+.img-fluid.rounded-circle {
+  border: 4px solid white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transition: transform var(--transition-speed) var(--transition-function);
+  object-fit: cover;
+}
+
+.img-fluid.rounded-circle:hover {
+  transform: scale(1.05);
+}
+
+/* Section d'édition de l'avatar */
+.avatar-edit-section {
+  margin-top: 1rem;
+}
+
+.avatar-edit-section input[type="file"] {
+  margin-bottom: 0.5rem;
+}
+
+/* Style des titres */
+h4 {
+  color: #1E40AF;
+  font-weight: 600;
+  position: relative;
+  padding-bottom: 0.75rem;
+}
+
+h4::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #1E40AF, #3B82F6);
+  border-radius: 3px;
+}
+
+/* Style des labels du formulaire */
+.form-label {
+  color: #4b5563;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Style des champs de formulaire */
+.form-control, .form-select {
+  border-color: #e5e7eb;
+  border-radius: var(--border-radius-md);
+  padding: 0.75rem 1rem;
+  box-shadow: none;
+  transition: all 0.2s ease;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+/* Affichage en lecture seule */
+.form-control-plaintext {
+  padding: 0.75rem 0;
+  font-weight: 500;
+  color: #1f2937;
+  background-color: #f9fafb;
+  border-radius: var(--border-radius-md);
+  padding-left: 1rem;
+  margin-bottom: 0;
+}
+
+/* Highlight pour email et ville/établissement */
+.email-display {
+  color: #1e40af;
+}
+
+.email-display small {
+  color: #6b7280;
+  font-weight: normal;
+}
+
+.ville-etablissement {
+  color: #1e40af;
+  font-weight: 600;
+}
+
+/* Séparateur */
+hr {
+  margin: 2rem 0;
+  opacity: 0.15;
+  border-color: #6b7280;
+}
+
+/* Boutons améliorés */
+.btn {
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-primary {
+  background-color: #1e40af;
+  border-color: #1e40af;
+  color: white;
+  box-shadow: 0 2px 5px rgba(30, 64, 175, 0.3);
+}
+
+.btn-primary:hover, .btn-primary:focus {
+  background-color: #1e3a8a;
+  border-color: #1e3a8a;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(30, 64, 175, 0.4);
+}
+
+.btn-secondary {
+  background-color: #4b5563;
+  border-color: #4b5563;
+  box-shadow: 0 2px 5px rgba(75, 85, 99, 0.3);
+}
+
+.btn-secondary:hover, .btn-secondary:focus {
+  background-color: #374151;
+  border-color: #374151;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(75, 85, 99, 0.4);
+}
+
+.btn-light {
+  background-color: #f9fafb;
+  border-color: #e5e7eb;
+  color: #4b5563;
+}
+
+.btn-light:hover, .btn-light:focus {
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+/* Styles pour les icônes FontAwesome */
+.fas {
+  color: inherit;
+  transition: all var(--transition-speed) var(--transition-function);
+}
+
+.btn .fas {
+  font-size: 0.875rem;
+}
+
+.info-badge .fas {
+  font-size: 0.75rem;
+}
+
+h4 .fas {
+  color: #1e40af;
+  font-size: 1.1rem;
+}
+
+/* Animation pour les icônes de chargement */
+.fa-spinner {
+  animation: spin 1s linear infinite;
+}
+
+/* Amélioration des transitions */
+.ville-etablissement,
+.email-display,
+.academic-info {
+  transition: all var(--transition-speed) var(--transition-function);
+}
+
+.ville-etablissement:hover,
+.email-display:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Adaptation responsive */
+@media (max-width: 767.98px) {
+  .card-body {
+    padding: 1.5rem;
+  }
+  
+  .col-md-4.text-center {
+    margin-bottom: 2rem;
+  }
+  
+  .img-fluid.rounded-circle {
+    width: 120px !important;
+    height: 120px !important;
+  }
+  
+  h4 {
+    margin-top: 0.5rem;
+  }
+  
+  .btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  
+  .d-flex.justify-content-start {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+    margin: 1rem auto;
+  }
+  
+  .academic-info {
+    padding: 1rem;
+  }
+  
+  .ville-etablissement,
+  .email-display {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+  }
+  
+  .info-badge {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+  }
+  
+  .loading-container {
+    padding: 2rem 1rem;
+  }
+}
+
+/* Animations pour les transitions d'état */
+.alert, .card {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Effet de pulsation pour le bouton d'édition */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.btn-secondary:not(:disabled):not(:active) {
+  animation: pulse 2s infinite;
+}
+
+/* Amélioration de l'affichage des erreurs de validation */
+.text-danger {
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+  display: block;
+  font-weight: 500;
+}
+
+/* Style spécifique pour les messages de chargement */
+.text-muted.small {
+  display: flex;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.text-muted.small::before {
+  content: '';
+  display: inline-block;
+  width: 0.85rem;
+  height: 0.85rem;
+  border: 2px solid rgba(59, 130, 246, 0.3);
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+  animation: spin 1s linear infinite;
+}
+
+/* Animation d'entrée pour les éléments */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card,
+.academic-info,
+.ville-etablissement,
+.email-display {
+  animation: slideInUp 0.6s ease-out;
+}
+
+/* Effet de focus amélioré pour l'accessibilité */
+.form-control:focus,
+.form-select:focus,
+.btn:focus {
+  outline: 2px solid rgba(59, 130, 246, 0.5);
+  outline-offset: 2px;
+}
+
+/* Top Section: Avatar, Name, Actions */
+.profile-top-section {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px; /* Increased bottom margin */
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e2e8f0; /* Subtle separator */
+}
+
+.avatar-display {
+  position: relative;
+  margin-right: 25px; /* Increased spacing next to avatar */
+}
+
+.profile-avatar {
+  width: 120px; /* Larger avatar */
+  height: 120px;
+  border-radius: 50%;
+  border: 3px solid #cbd5e0; /* Border for avatar */
+}
+
+.avatar-edit-overlay {
+  background-color: rgba(0, 0, 0, 0.6); /* Darker overlay for better icon visibility */
+  color: #fff; /* White icon color */
+}
+.avatar-edit-overlay span {
+  font-size: 0.9em; /* Slightly larger text for "Changer" */
+}
+
+.main-info-actions {
+  flex-grow: 1;
+}
+
+.user-name-display {
+  font-size: 1.8em; /* Larger user name */
+  font-weight: 600; /* Bolder user name */
+  color: #2d3748;
+  margin-bottom: 0.25em;
+}
+
+.user-email-display {
+  font-size: 1em;
+  color: #718096; /* Softer color for email */
+  margin-bottom: 1em;
+}
+
+/* Action Buttons */
+.action-buttons .btn {
+  padding: 10px 20px; /* Larger buttons */
+  font-size: 1em; /* Larger font size for buttons */
+  border-radius: 6px;
+}
+.btn-primary {
+  background-color: #4299e1; /* Example primary color */
+  color: white;
+}
+.btn-primary:hover {
+  background-color: #3182ce;
+}
+.btn-secondary {
+  background-color: #a0aec0; /* Example secondary color */
+  color: white;
+}
+.btn-secondary:hover {
+  background-color: #718096;
+}
+.btn-accent {
+  background-color: #48bb78; /* Example accent color */
+  color: white;
+}
+.btn-accent:hover {
+  background-color: #38a169;
+}
+
+
+/* Form Sections */
+.form-sections-container {
+  margin-top: 20px;
+}
+
+.form-section {
+  margin-bottom: 30px; /* Increased spacing between sections */
+  padding: 20px;
+  border: 1px solid #e2e8f0; /* Border for sections */
+  border-radius: 8px;
+  background-color: #fff; /* White background for form sections */
+}
+
+.section-heading {
+  font-size: 1.5em; /* Larger section headings */
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 20px; /* Increased space below heading */
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+/* Form Elements */
+.form-group {
+  margin-bottom: 20px; /* Increased spacing for form groups */
+}
+
+.form-label {
+  display: block;
+  font-size: 1em; /* Clearer label font size */
+  font-weight: 500;
+  color: #4a5568;
+  margin-bottom: 8px; /* More space below label */
+}
+
+.input-field,
+.input-field-disabled {
+  width: 100%;
+  padding: 12px 15px; /* Increased padding in input fields */
+  font-size: 1em;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  transition: border-color 0.2s ease-in-out;
+}
+
+.input-field:focus {
+  border-color: #4299e1; /* Highlight focus */
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
+  outline: none;
+}
+
+.input-field-disabled {
+  background-color: #edf2f7;
+  color: #718096;
+  cursor: not-allowed;
+}
+
+/* Validation and Messages */
+.invalid-feedback {
+  color: #e53e3e; /* Red for error messages */
+  font-size: 0.9em;
+  margin-top: 5px;
+}
+
+.alert {
+  padding: 15px; /* More padding for alerts */
+  margin-bottom: 20px;
+  border-radius: 6px;
+  font-size: 1em;
+}
+.alert-danger {
+  background-color: #fed7d7;
+  color: #c53030;
+  border: 1px solid #fbb6b6;
+}
+.alert-success {
+  background-color: #c6f6d5;
+  color: #2f855a;
+  border: 1px solid #9ae6b4;
+}
+
+/* Loading and Helper Text */
+.loading-overlay {
+  /* Consider adding a more prominent loading indicator */
+  font-size: 1.2em;
+  text-align: center;
+  padding: 30px;
+}
+
+.text-xs { /* Ensure helper texts are also legible */
+  font-size: 0.9em;
+}
+
+/* Responsive Adjustments (example) */
+@media (max-width: 768px) {
+  .profile-top-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .avatar-display {
+    margin-bottom: 15px;
+  }
+  .main-info-actions {
+    width: 100%;
+  }
+  .action-buttons {
+    margin-top: 15px;
+  }
+  .user-name-display {
+    font-size: 1.6em;
+  }
+  .section-heading {
+    font-size: 1.3em;
+  }
+}
+
+/* Ensure icons are vertically aligned with text in buttons */
+.btn i.fas {
+  vertical-align: middle;
+}
+
+/* Spinner styling if not already globally defined */
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Ensure sufficient contrast for placeholder text if you use it */
+.input-field::placeholder {
+  color: #a0aec0; /* Lighter placeholder text */
+  opacity: 1; /* Firefox */
+}
+.input-field:-ms-input-placeholder { /* Internet Explorer 10-11 */
+ color: #a0aec0;
+}
+.input-field::-ms-input-placeholder { /* Microsoft Edge */
+ color: #a0aec0;
+}
+
+/* Styling for the "Ancien nom" text */
+.text-gray-500 {
+  color: #718096; /* Standard gray color */
+}
+.dark .text-gray-400 {
+  color: #a0aec0; /* Lighter gray for dark mode if applicable */
+}
+
+/* Ensure select dropdowns are also styled consistently */
+select.input-field {
+  appearance: none; /* Remove default system appearance */
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007bff%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+  background-repeat: no-repeat;
+  background-position: right 0.7em top 50%, 0 0;
+  background-size: 0.65em auto, 100%;
+  padding-right: 2.5em; /* Make space for the arrow */
+}
+
+/* Disabled state for select */
+select.input-field:disabled,
+select.input-field[readonly] { /* Treat readonly visually like disabled for select */
+  background-color: #edf2f7;
+  color: #718096;
+  cursor: not-allowed;
+  border-color: #cbd5e0;
+  opacity: 0.7;
+}
+
+/* Ensure hidden class actually hides elements */
+.hidden {
+  display: none !important;
+}

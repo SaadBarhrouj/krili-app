@@ -1,0 +1,233 @@
+<!-- src/app/proprietaire/dashboard/dashboard.component.html -->
+  <!-- Sidebar -->
+
+
+  <!-- Main Content -->
+
+    <!-- Welcome section -->
+    <div class="welcome-section">
+      <div>
+        <h1 class="welcome-title">
+          Bonjour, {{ currentUser?.nom || 'Propriétaire' }} 👋
+        </h1>
+        <p class="welcome-subtitle">Voici un aperçu de vos logements et demandes en cours.</p>
+      </div>
+      <div class="welcome-actions">
+        <a routerLink="/proprietaire/logements/nouveau" class="btn-new-listing">
+          <i class="fas fa-plus-circle"></i>
+          Ajouter un logement
+        </a>
+      </div>
+    </div>
+
+    <!-- Stats cards -->
+    <div class="stats-grid">
+      <!-- Logements actifs -->
+      <div class="stat-card">
+        <div class="stat-icon" style="background-color: rgba(255, 90, 25, 0.1);">
+          <i class="fas fa-building" style="color: var(--accent);"></i>
+        </div>
+        <div class="stat-details">
+          <h3 class="stat-value">{{ myStats.logementsActifs }}</h3>
+          <p class="stat-label">Logements actifs</p>
+        </div>
+      </div>
+      
+      <!-- Demandes en cours -->
+      <div class="stat-card">
+        <div class="stat-icon" style="background-color: rgba(37, 99, 235, 0.1);">
+          <i class="fas fa-clipboard-list" style="color: var(--primary);"></i>
+        </div>
+        <div class="stat-details">
+          <h3 class="stat-value">{{ myStats.demandesEnCours }}</h3>
+          <p class="stat-label">Demandes en cours</p>
+        </div>
+      </div>
+      
+      <!-- Visites -->
+      <div class="stat-card">
+        <div class="stat-icon" style="background-color: rgba(74, 222, 128, 0.1);">
+          <i class="fas fa-eye" style="color: var(--secondary);"></i>
+        </div>
+        <div class="stat-details">
+          <h3 class="stat-value">{{ myStats.visites }}</h3>
+          <p class="stat-label">Visites cette semaine</p>
+        </div>
+      </div>
+      
+      <!-- Revenus -->
+      <div class="stat-card">
+        <div class="stat-icon" style="background-color: rgba(124, 58, 237, 0.1);">
+          <i class="fas fa-euro-sign" style="color: #7C3AED;"></i>
+        </div>
+        <div class="stat-details">
+          <h3 class="stat-value">{{ myStats.revenus }}€</h3>
+          <p class="stat-label">Revenus du mois</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent requests section -->
+    <div class="section-container">
+      <div class="section-header">
+        <h2 class="section-title">Demandes récentes</h2>
+        <a href="#" class="section-link">Voir toutes les demandes</a>
+      </div>
+      <div class="requests-list">
+        <!-- Request 1 -->
+        <div class="request-card">
+          <div class="request-content">
+            <div class="request-image">
+              <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-1.2.1&auto=format&fit=crop&w=160&h=120&q=80" alt="Colocation 4 étudiants">
+            </div>
+            <div class="request-details">
+              <div class="request-header">
+                <div>
+                  <h3 class="request-title">Colocation 4 étudiants - Lyon 3ème</h3>
+                  <p class="request-address">15 rue des Universités, 69003 Lyon</p>
+                </div>
+                <div>
+                  <span class="status-badge pending">En attente</span>
+                </div>
+              </div>
+              <div class="request-meta">
+                <div class="request-date"><i class="fas fa-calendar-alt"></i>Demande reçue le 15/06/2023</div>
+                <div class="request-price"><i class="fas fa-euro-sign"></i>380€/mois/chambre</div>
+              </div>
+              <div class="request-applicant">
+                <div class="applicant-info">
+                  <img src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=32&h=32&q=80" alt="Thomas">
+                  <span>Demandeur: Thomas Lambert</span>
+                  <span class="applicant-tag">Étudiant en Informatique</span>
+                </div>
+                <div class="request-actions">
+                  <button (click)="acceptRequest(1)" class="btn-success"><i class="fas fa-check"></i>Accepter</button>
+                  <button (click)="rejectRequest(1)" class="btn-outline"><i class="fas fa-times"></i>Refuser</button>
+                  <button (click)="messageApplicant('Thomas Lambert')" class="btn-primary"><i class="fas fa-comment"></i>Message</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- My listings section -->
+    <div class="section-container">
+      <div class="section-header">
+        <h2 class="section-title">Mes logements</h2>
+        <a href="#" class="section-link">Gérer tous mes logements</a>
+      </div>
+
+      <!-- Indicateur de chargement -->
+      <div *ngIf="isLoadingListings" class="loading-indicator">
+        <svg class="loading-spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <p>Chargement...</p>
+      </div>
+
+      <!-- Message d'erreur -->
+      <div *ngIf="!isLoadingListings && loadingError" class="alert alert-danger">
+        {{ loadingError }}
+      </div>
+
+      <!-- Tableau ou message si vide -->
+      <div *ngIf="!isLoadingListings && !loadingError">
+        <div *ngIf="myListings.length > 0; else noListings" class="table-container">
+          <table class="listings-table">
+            <thead>
+              <tr>
+                <th>Logement</th>
+                <th>Localisation</th>
+                <th>Prix</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let logement of myListings">
+                <td>
+                  <div class="listing-cell">
+                    <div class="listing-image">
+                      <img [src]="getImageUrl(logement.photos?.[0])" [alt]="logement.adresseLigne1">
+                    </div>
+                    <div class="listing-info">
+                      <div class="listing-type">{{ logement.type }}</div>
+                      <div class="listing-specs">{{ logement.surface || 'N/A' }}m² - {{ logement.nombreDePieces || 'N/A' }} pièce(s)</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="listing-city">{{ getCityFromAddress(logement.adresseLigne1) }}</div>
+                 <div class="listing-address" [title]="logement.adresseLigne1 || ''">{{ logement.adresseLigne1 }}</div>
+                </td>
+                <td>
+                  <div class="listing-price">{{ logement.prix }}€</div>
+                  <div class="listing-price-period">/mois</div>
+                </td>
+                <td>
+                  <span class="status-badge" [ngClass]="getStatutClass(logement.statut)">{{ getStatutLibelle(logement.statut) }}</span>
+                </td>
+                <td>
+                  <div class="listing-actions">
+                    <button (click)="editLogement(logement.id)" class="action-button" title="Modifier">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button (click)="viewStats(logement.id)" class="action-button" title="Statistiques">
+                      <i class="fas fa-chart-line"></i>
+                    </button>
+                    <button (click)="viewOptions(logement.id)" class="action-button" title="Options">
+                      <i class="fas fa-cog"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- Template si aucun logement -->
+        <ng-template #noListings>
+          <div class="empty-state">
+            <i class="fas fa-home"></i>
+            <p>Vous n'avez pas encore ajouté de logement.</p>
+            <a routerLink="/proprietaire/logements/nouveau" class="btn-accent">
+              Ajouter votre premier logement
+            </a>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+
+    <!-- Messages section -->
+    <div class="section-container">
+      <div class="section-header">
+        <h2 class="section-title">Messages récents</h2>
+        <a href="#" class="section-link">Voir tous les messages</a>
+      </div>
+      <div class="messages-list">
+        <!-- Message 1 -->
+        <div class="message-card">
+          <div class="message-avatar">
+            <img src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=32&h=32&q=80" alt="Thomas">
+          </div>
+          <div class="message-content">
+            <div class="message-header">
+              <div>
+                <h3 class="message-sender">Thomas Lambert</h3>
+                <p class="message-subject">Au sujet de: Colocation 4 étudiants - Lyon 3ème</p>
+              </div>
+              <span class="message-time">Il y a 1 heure</span>
+            </div>
+            <p class="message-preview">Bonjour, je souhaiterais obtenir plus d'informations sur les équipements disponibles...</p>
+            <div class="message-actions">
+              <button (click)="messageApplicant('Thomas Lambert')" class="btn-primary">Répondre</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    

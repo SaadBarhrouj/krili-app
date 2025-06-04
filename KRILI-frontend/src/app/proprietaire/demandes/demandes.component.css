@@ -1,0 +1,83 @@
+/* Styles améliorés pour le composant demandes */
+
+/* Style de carte avec ombre au survol */
+.demande-card {
+  transition: all 0.3s ease-in-out;
+}
+
+.demande-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Styles des badges de statut */
+.status-pill {
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+/* Style de l'image du logement avec une transition fluide */
+.logement-image-demande img {
+  transition: transform 0.5s ease;
+}
+
+.logement-image-demande:hover img {
+  transform: scale(1.05);
+}
+
+/* Amélioration des transitions pour les boutons */
+button {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Styles pour l'état vide */
+.empty-state {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Amélioration du design des messages */
+.message-box {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.message-box:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Style pour les onglets de filtrage */
+.filter-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.filter-btn::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: currentColor;
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.filter-btn:hover::after {
+  width: 80%;
+}
+
+/* Animation du spinner de chargement */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}

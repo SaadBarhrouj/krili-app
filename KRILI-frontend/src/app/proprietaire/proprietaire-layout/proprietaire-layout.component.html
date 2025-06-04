@@ -1,0 +1,79 @@
+<!-- src/app/proprietaire/dashboard/dashboard.component.html -->
+<div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <!-- Modification du logo pour reprendre le style du landing -->
+        <div class="logo">
+          <a routerLink="/" class="flex items-center">
+            <svg class="h-10 w-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 9L12 4L21 9L12 14L3 9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="stroke: var(--primary);"/>
+              <path d="M5 11V17L12 21L19 17V11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="stroke: var(--primary);"/>
+            </svg>
+            <h1 class="text-2xl font-bold ml-2" style="color: var(--primary);">KRILI</h1>
+          </a>
+        </div>
+        <button class="sidebar-toggle md:hidden">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+      
+      <div class="sidebar-user">
+        <div class="user-avatar">
+          <img [src]="avatarUrl" alt="Avatar Propriétaire">
+        </div>
+        <div class="user-info">
+          <h3 class="user-name">{{ currentUserInfo?.nom || 'Propri??taire' }}</h3>
+          <p class="user-role">Propriétaire</p>
+        </div>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <a routerLink="/proprietaire/dashboard" routerLinkActive="active" class="nav-item">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>Tableau de bord</span>
+        </a>
+        <a routerLink="/proprietaire/logements" routerLinkActive="active" class="nav-item">
+          <i class="fas fa-building"></i>
+          <span>Mes logements</span>
+          <span class="nav-badge">{{ myStats.logementsActifs }}</span>
+        </a>
+        <a routerLink="/proprietaire/demandes" routerLinkActive="active" class="nav-item">
+          <i class="fas fa-clipboard-list"></i>
+          <span>Demandes</span>
+          <span class="nav-badge">{{ myStats.demandesEnCours }}</span>
+        </a>
+        <a routerLink="/proprietaire/messages" routerLinkActive="active" class="nav-item">
+          <i class="fas fa-comment-alt"></i>
+          <span>Messages</span>
+          <span class="nav-badge">2</span>
+        </a>
+        <a routerLink="/proprietaire/statistiques" routerLinkActive="active" class="nav-item">
+          <i class="fas fa-chart-line"></i>
+          <span>Statistiques</span>
+        </a>
+        <a routerLink="/proprietaire/profil" routerLinkActive="active" class="nav-item">
+          <i class="fas fa-user"></i>
+          <span>Profil</span>
+        </a>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <a routerLink="/proprietaire/logements/nouveau" class="create-listing-btn">
+          <i class="fas fa-plus-circle"></i>
+          <span>Ajouter un logement</span>
+        </a>
+        <a (click)="logout()" class="logout-btn">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Déconnexion</span>
+        </a>
+      </div>
+    </aside>
+  
+    <!-- Main Content -->
+    <main class="main-content">
+      <router-outlet></router-outlet>
+  
+      
+    </main>
+  </div>

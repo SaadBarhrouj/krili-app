@@ -1,0 +1,546 @@
+<!-- src/app/landing/landing.component.html -->
+<!-- Contenu principal de la landing page, avec header et footer -->
+<div class="landing-container">  <!-- Header -->
+  <header class="px-6 py-5 border-b" style="border-color: var(--border);">
+      <div class="container mx-auto flex justify-between items-center">
+          <!-- Logo section -->
+          <a routerLink="/" class="flex items-center">
+              <svg class="h-12 w-12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M3 9L12 4L21 9L12 14L3 9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="stroke: var(--primary);"/>
+                  <path d="M5 11V17L12 21L19 17V11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="stroke: var(--primary);"/>
+              </svg>
+              <h1 class="text-3xl font-bold ml-3" style="color: var(--primary);">KRILI</h1>
+          </a>
+            <!-- Desktop Navigation -->
+          <div class="hidden md:flex items-center space-x-8">
+              <a (click)="scrollToSection('fonctionnalites')" class="text-lg font-medium hover:underline cursor-pointer">Fonctionnalités</a>
+              <a (click)="scrollToSection('etudiants')" class="text-lg font-medium hover:underline cursor-pointer">Étudiants</a>
+              <a (click)="scrollToSection('proprietaires')" class="text-lg font-medium hover:underline cursor-pointer">Propriétaires</a>
+              <a (click)="scrollToSection('comment-ca-marche')" class="text-lg font-medium hover:underline cursor-pointer">Comment ça marche</a>
+          </div>
+          
+          <!-- Auth Buttons / User Profile -->
+          <div class="flex items-center space-x-4">
+              <ng-container *ngIf="!isEtudiant(); else userProfile">
+                  <a routerLink="/login" class="btn-secondary text-base px-4 py-2">Connexion</a>
+                  <a routerLink="/register/etudiant" class="btn-accent text-base px-4 py-2">Inscription</a>
+              </ng-container>
+
+              <ng-template #userProfile>
+                  <div class="relative">
+                      <button (click)="toggleUserDropdown()" class="flex items-center space-x-2 focus:outline-none">
+                          <img [src]="avatarUrl" alt="User Avatar" class="w-10 h-10 rounded-full object-cover">
+                          <span class="font-medium" style="color: var(--text);">{{ currentUser?.nom }}</span>
+                          <i class="fas fa-chevron-down text-xs" style="color: var(--text-light);"></i> <!-- Make sure you have Font Awesome for this icon -->
+                      </button>
+                      <div *ngIf="isUserDropdownOpen" class="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg py-1 z-50" style="border: 1px solid var(--border);">
+                          <a routerLink="/etudiant/mes-favoris" class="block px-4 py-2 text-sm hover:bg-gray-100" style="color: var(--text);">Mes Favoris</a>
+                          <a routerLink="/etudiant/mes-reservations" class="block px-4 py-2 text-sm hover:bg-gray-100" style="color: var(--text);">Mes Réservations</a>
+                          <a routerLink="/etudiant/profil-etudiant" class="block px-4 py-2 text-sm hover:bg-gray-100" style="color: var(--text);">Mon Profil</a> 
+                          <a routerLink="/etudiant/notifications" class="block px-4 py-2 text-sm hover:bg-gray-100" style="color: var(--text);">Notifications</a>
+                          <hr style="border-color: var(--border); margin: 4px 0;">
+                          <button (click)="logout()" class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100" style="color: var(--accent-dark);">Déconnexion</button>
+                      </div>
+                  </div>
+                  <a routerLink="/etudiant/notifications" class="relative ml-4">
+                      <i class="fas fa-bell text-xl" style="color: var(--text-light);"></i> <!-- Make sure you have Font Awesome for this icon -->
+                      <!-- You can add a badge for notification count here if needed -->
+                  </a>
+              </ng-template>
+          </div>
+      </div>
+  </header>
+  <!-- Mobile Navigation -->
+  <div class="md:hidden flex justify-between items-center p-5 border-b" style="border-color: var(--border);">
+      <div class="text-center w-full">
+          <a (click)="scrollToSection('fonctionnalites')" class="inline-block mx-3 text-base font-medium cursor-pointer">Fonctionnalités</a>
+          <a (click)="scrollToSection('etudiants')" class="inline-block mx-3 text-base font-medium cursor-pointer">Étudiants</a>
+          <a (click)="scrollToSection('proprietaires')" class="inline-block mx-3 text-base font-medium cursor-pointer">Propriétaires</a>
+          <a (click)="scrollToSection('comment-ca-marche')" class="inline-block mx-3 text-base font-medium cursor-pointer">Comment ça marche</a>
+      </div>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="py-16 md:py-28">
+      <div class="container mx-auto px-4">
+          <div class="flex flex-col md:flex-row items-center">
+              <div class="md:w-1/2 mb-12 md:mb-0 md:pr-12">
+                  <h1 class="text-4xl md:text-5xl font-bold mb-8" style="color: var(--text);">
+                      Trouvez votre logement étudiant <span style="color: var(--accent);">sans stress</span>
+                  </h1>
+                  <p class="text-lg mb-10" style="color: var(--text-light); max-width: 90%;">
+                      KRILI connecte les étudiants avec des propriétaires pour trouver
+                      facilement un logement près de leur université. Simple, rapide et sécurisé.
+                  </p>                  <div class="flex flex-col sm:flex-row gap-5 mb-6">
+                      <a routerLink="/register/etudiant" class="btn-accent text-center">
+                          Je suis étudiant
+                      </a>
+                      <a routerLink="/register/proprietaire" class="btn-secondary text-center">
+                          Je suis propriétaire
+                      </a>
+                  </div>
+              </div>              <div class="md:w-1/2">
+                  <div class="relative showcase-container">
+                      <div class="w-full h-80 md:h-96 rounded-lg absolute top-4 left-4" style="background-color: var(--primary); opacity: 0.1;"></div>
+                      <div class="card relative">
+                          <div class="showcase-image-container h-56 md:h-64">
+                              <img src="assets/images/apartment-hero.png" alt="Studio étudiant moderne" class="w-full h-full object-cover rounded-t-lg">
+                              <div class="image-overlay">
+                                  <h4 class="text-white font-semibold">Studio étudiant moderne et lumineux</h4>
+                              </div>
+                          </div>
+                          <div class="p-6">
+                              <h3 class="font-bold mb-2">Studio meublé - Centre Ville</h3>
+                              <p class="text-sm mb-3" style="color: var(--text-light);">2500 MAD/mois - 25m² - Proche Université</p>
+                              <div class="flex flex-wrap gap-2 mb-4">
+                                  <span class="equipment-tag text-xs">WiFi</span>
+                                  <span class="equipment-tag text-xs">Meublé</span>
+                                  <span class="equipment-tag text-xs">Cuisine équipée</span>
+                              </div>
+                              <a routerLink="/annonces" class="btn-primary w-full block text-center">Voir tous les logements</a>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="fonctionnalites" class="py-16 md:py-24" style="background-color: var(--background-alt);">
+      <div class="container mx-auto px-4">
+          <div class="text-center mb-16">
+              <h2 class="text-3xl font-bold mb-4 section-title" style="color: var(--text);">Pourquoi choisir KRILI?</h2>
+              <p class="text-lg max-w-3xl mx-auto" style="color: var(--text-light);">
+                  Notre plateforme simplifie la recherche de logement étudiant et la gestion locative
+              </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div class="feature-card">
+                  <div class="w-14 h-14 rounded-full flex items-center justify-center mb-6" style="background-color: var(--primary-light);">
+                      <i class="fas fa-map-marker-alt text-xl" style="color: var(--primary);"></i>
+                  </div>
+                  <h3 class="text-xl font-semibold mb-3" style="color: var(--text);">Proximité universitaire</h3>
+                  <p style="color: var(--text-light);">
+                      Trouvez des logements à proximité de votre campus pour minimiser vos temps de trajet.
+                  </p>
+              </div>
+              <div class="feature-card">
+                  <div class="w-14 h-14 rounded-full flex items-center justify-center mb-6" style="background-color: var(--primary-light);">
+                      <i class="fas fa-shield-alt text-xl" style="color: var(--primary);"></i>
+                  </div>
+                  <h3 class="text-xl font-semibold mb-3" style="color: var(--text);">Réservation sécurisée</h3>
+                  <p style="color: var(--text-light);">
+                      Système de réservation fiable avec vérification des profils et avis d'anciens locataires.
+                  </p>
+              </div>
+              <div class="feature-card">
+                  <div class="w-14 h-14 rounded-full flex items-center justify-center mb-6" style="background-color: var(--primary-light);">
+                      <i class="fas fa-clock text-xl" style="color: var(--primary);"></i>
+                  </div>
+                  <h3 class="text-xl font-semibold mb-3" style="color: var(--text);">Gain de temps</h3>
+                  <p style="color: var(--text-light);">
+                      Filtres avancés pour trouver rapidement un logement qui correspond à vos critères.
+                  </p>
+              </div>
+          </div>
+      </div>
+  </section>
+
+  <!-- For Students Section -->
+  <section id="etudiants" class="py-16 md:py-24">
+      <div class="container mx-auto px-4">
+          <div class="flex flex-col md:flex-row items-center">
+              <div class="md:w-1/2 mb-10 md:mb-0 md:pr-10">
+                  <div style="color: var(--primary);" class="text-sm font-semibold uppercase tracking-wide mb-2">Pour les étudiants</div>
+                  <h2 class="text-3xl font-bold mb-6 section-title" style="color: var(--text);">Trouvez votre logement idéal</h2>
+                  <p class="text-lg mb-6" style="color: var(--text-light);">
+                      Recherchez et réservez facilement un logement près de votre université.
+                  </p>
+                  <ul class="space-y-4 mb-8">
+                      <li class="flex items-start">
+                          <div class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-white mt-1" style="background-color: var(--accent);">
+                              <i class="fas fa-check text-xs"></i>
+                          </div>
+                          <div class="ml-3">
+                              <h4 class="text-lg font-medium" style="color: var(--text);">Recherche simple</h4>
+                              <p style="color: var(--text-light);">Filtrez par université, budget, type de logement ou commodités.</p>
+                          </div>
+                      </li>
+                      <li class="flex items-start">
+                          <div class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-white mt-1" style="background-color: var(--accent);">
+                              <i class="fas fa-check text-xs"></i>
+                          </div>
+                          <div class="ml-3">
+                              <h4 class="text-lg font-medium" style="color: var(--text);">Réservation en ligne</h4>
+                              <p style="color: var(--text-light);">Réservez directement sur la plateforme sans paperasse inutile.</p>
+                          </div>
+                      </li>
+                      <li class="flex items-start">
+                          <div class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-white mt-1" style="background-color: var(--accent);">
+                              <i class="fas fa-check text-xs"></i>
+                          </div>
+                          <div class="ml-3">
+                              <h4 class="text-lg font-medium" style="color: var(--text);">Avis vérifiés</h4>
+                              <p style="color: var(--text-light);">Consultez les avis d'autres étudiants pour faire le bon choix.</p>
+                          </div>
+                      </li>
+                  </ul>
+                  <a routerLink="/register/etudiant" class="btn-accent inline-block">
+                      Trouver mon logement
+                  </a>
+              </div>              <div class="md:w-1/2">
+                  <div class="modern-illustration-container h-80 md:h-96">
+                      <img src="assets/images/student-searching.jpg" alt="Étudiant recherchant un logement" class="rounded-lg w-full h-full object-cover">
+                      <div class="modern-illustration-overlay">
+                          <div class="overlay-content">
+                              <h3 class="font-semibold text-xl mb-2 text-white">Recherche simplifiée</h3>
+                              <p class="text-white text-opacity-90">Trouvez facilement le logement idéal pour vos études</p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+
+  <!-- For Property Owners -->
+  <section id="proprietaires" class="py-16 md:py-24" style="background-color: var(--background-alt);">
+      <div class="container mx-auto px-4">
+          <div class="flex flex-col md:flex-row-reverse items-center mb-16">
+              <div class="md:w-1/2 mb-10 md:mb-0 md:pl-10">
+                  <div style="color: var(--primary);" class="text-sm font-semibold uppercase tracking-wide mb-2">Pour les propriétaires</div>
+                  <h2 class="text-3xl font-bold mb-6 section-title" style="color: var(--text);">Gérez vos biens et trouvez les bons locataires</h2>
+                  <p class="text-lg mb-6" style="color: var(--text-light);">
+                      Profitez de nos outils pour publier vos annonces, vérifier les profils et gérer vos locations facilement.
+                  </p>
+                  <ul class="space-y-4 mb-8">
+                      <li class="flex items-start">
+                          <div class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-white mt-1" style="background-color: var(--accent);">
+                              <i class="fas fa-check text-xs"></i>
+                          </div>
+                          <div class="ml-3">
+                              <h4 class="text-lg font-medium" style="color: var(--text);">Publication simplifiée</h4>
+                              <p style="color: var(--text-light);">Créez facilement des annonces détaillées pour vos logements.</p>
+                          </div>
+                      </li>
+                      <li class="flex items-start">
+                          <div class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-white mt-1" style="background-color: var(--accent);">
+                              <i class="fas fa-check text-xs"></i>
+                          </div>
+                          <div class="ml-3">
+                              <h4 class="text-lg font-medium" style="color: var(--text);">Vérification des profils</h4>
+                              <p style="color: var(--text-light);">Les étudiants sont vérifiés pour garantir des locataires fiables.</p>
+                          </div>
+                      </li>
+                      <li class="flex items-start">
+                          <div class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-white mt-1" style="background-color: var(--accent);">
+                              <i class="fas fa-check text-xs"></i>
+                          </div>
+                          <div class="ml-3">
+                              <h4 class="text-lg font-medium" style="color: var(--text);">Gestion facilitée</h4>
+                              <p style="color: var(--text-light);">Gérez réservations, documents et paiements en un seul endroit.</p>
+                          </div>
+                      </li>
+                      <li class="flex items-start">
+                          <div class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-white mt-1" style="background-color: var(--accent);">
+                              <i class="fas fa-check text-xs"></i>
+                          </div>
+                          <div class="ml-3">
+                              <h4 class="text-lg font-medium" style="color: var(--text);">Boostez la visibilité de vos annonces</h4>
+                              <p style="color: var(--text-light);">Attirez plus de locataires potentiels avec nos options de mise en avant.</p>
+                          </div>
+                      </li>
+                  </ul>
+              </div>              <div class="md:w-1/2">
+                  <div class="modern-illustration-container h-80 md:h-96">
+                      <img src="assets/images/property-owner.jpg" alt="Propriétaire gérant son bien" class="rounded-lg w-full h-full object-cover">
+                      <div class="modern-illustration-overlay">
+                          <div class="overlay-content">
+                              <h3 class="font-semibold text-xl mb-2 text-white">Gestion simplifiée</h3>
+                              <p class="text-white text-opacity-90">Publiez vos annonces et gérez vos biens avec facilité</p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <div class="text-center mt-12">
+              <a routerLink="/register/proprietaire" class="btn-accent inline-block">
+                  Publier mon logement
+              </a>
+          </div>
+      </div>
+  </section>
+
+  <!-- How It Works -->
+  <section id="comment-ca-marche" class="py-16 md:py-24">
+      <div class="container mx-auto px-4">
+          <div class="text-center mb-16">
+              <h2 class="text-3xl font-bold mb-4 section-title" style="color: var(--text);">Comment ça marche ?</h2>
+              <p class="text-lg max-w-3xl mx-auto" style="color: var(--text-light);">
+                  En quelques étapes simples, trouvez votre logement idéal ou publiez votre bien
+              </p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div class="feature-card text-center">
+                  <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6" style="background-color: var(--primary);">
+                      <span class="text-white font-bold text-xl">1</span>
+                  </div>
+                  <h3 class="text-xl font-semibold mb-3" style="color: var(--text);">Créez votre compte</h3>
+                  <p style="color: var(--text-light);">
+                      Inscrivez-vous gratuitement en tant qu'étudiant ou propriétaire et complétez votre profil.
+                  </p>
+              </div>
+              <div class="feature-card text-center">
+                  <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6" style="background-color: var(--primary);">
+                      <span class="text-white font-bold text-xl">2</span>
+                  </div>
+                  <h3 class="text-xl font-semibold mb-3" style="color: var(--text);">Recherchez ou publiez</h3>
+                  <p style="color: var(--text-light);">
+                      Étudiants : recherchez des logements.<br>
+                      Propriétaires : créez vos annonces.
+                  </p>
+              </div>
+              <div class="feature-card text-center">
+                  <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6" style="background-color: var(--primary);">
+                      <span class="text-white font-bold text-xl">3</span>
+                  </div>
+                  <h3 class="text-xl font-semibold mb-3" style="color: var(--text);">Réservez ou gérez</h3>
+                  <p style="color: var(--text-light);">
+                      Étudiants : réservez en ligne.<br>
+                      Propriétaires : gérez les demandes.
+                  </p>
+              </div>
+          </div>
+      </div>
+  </section>
+
+  <!-- Equipment Section -->
+  <section class="py-16 md:py-24" style="background-color: var(--background-alt);">
+      <div class="container mx-auto px-4">
+          <div class="flex flex-col md:flex-row items-center">
+              <div class="md:w-1/2 mb-10 md:mb-0 md:pr-10">
+                  <div style="color: var(--primary);" class="text-sm font-semibold uppercase tracking-wide mb-2">Des logements équipés</div>
+                  <h2 class="text-3xl font-bold mb-6 section-title" style="color: var(--text);">Trouvez un logement avec tous les équipements nécessaires</h2>
+                  <p class="text-lg mb-6" style="color: var(--text-light);">
+                      Utilisez nos filtres pour trouver un logement qui correspond exactement à vos besoins.
+                  </p>
+                  <div class="mb-8">
+                      <h4 class="text-lg font-medium mb-4" style="color: var(--text);">Équipements populaires</h4>
+                      <div class="flex flex-wrap">
+                          <span class="equipment-tag">
+                              <i class="fas fa-wifi mr-2"></i>WiFi
+                          </span>
+                          <span class="equipment-tag">
+                              <i class="fas fa-snowflake mr-2"></i>Climatisation
+                          </span>
+                          <span class="equipment-tag">
+                              <i class="fas fa-fire mr-2"></i>Chauffage
+                          </span>
+                          <span class="equipment-tag">
+                              <i class="fas fa-washer mr-2"></i>Lave-linge
+                          </span>
+                          <span class="equipment-tag">
+                              <i class="fas fa-utensils mr-2"></i>Cuisine équipée
+                          </span>
+                          <span class="equipment-tag">
+                              <i class="fas fa-parking mr-2"></i>Parking
+                          </span>
+                          <span class="equipment-tag">
+                              <i class="fas fa-couch mr-2"></i>Meublé
+                          </span>
+                          <span class="equipment-tag">
+                              <i class="fas fa-bath mr-2"></i>Salle de bain privée
+                          </span>
+                      </div>
+                  </div>                  <a routerLink="/annonces" class="btn-accent inline-block equipment-btn">
+                      <i class="fas fa-home mr-2"></i> Voir tous les logements
+                  </a>
+              </div>              <div class="md:w-1/2">
+                   <div class="grid grid-cols-2 gap-4">
+                      <div class="feature-image-card">
+                          <img src="assets/images/wifi.png" alt="WiFi haut débit" class="feature-image">
+                          <div class="feature-overlay">
+                              <h4 class="font-medium" style="color: white;">WiFi haut débit</h4>
+                              <p class="text-xs text-white text-opacity-80">Restez connecté pour vos études</p>
+                          </div>
+                      </div>
+                      <div class="feature-image-card">
+                          <img src="assets/images/cuisine.jpg" alt="Cuisine équipée" class="feature-image">
+                          <div class="feature-overlay">
+                              <h4 class="font-medium" style="color: white;">Cuisine équipée</h4>
+                              <p class="text-xs text-white text-opacity-80">Préparez vos repas facilement</p>
+                          </div>
+                      </div>
+                      <div class="feature-image-card">
+                          <img src="assets/images/meuble.jpg" alt="Entièrement meublé" class="feature-image">
+                          <div class="feature-overlay">
+                              <h4 class="font-medium" style="color: white;">Entièrement meublé</h4>
+                              <p class="text-xs text-white text-opacity-80">Emménagez sans tracas</p>
+                          </div>
+                      </div>
+                      <div class="feature-image-card">
+                          <img src="assets/images/apartment-hero2.jpg" alt="Espace de travail" class="feature-image">
+                          <div class="feature-overlay">
+                              <h4 class="font-medium" style="color: white;">Espace de travail</h4>
+                              <p class="text-xs text-white text-opacity-80">Un coin bureau pour étudier</p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-20 md:py-28" style="background-color: var(--accent);">
+      <div class="container mx-auto px-4 text-center">
+          <h2 class="text-4xl md:text-5xl font-bold text-white mb-8">Prêt à trouver votre logement idéal ?</h2>
+          <p class="text-xl text-white opacity-95 mb-12 max-w-2xl mx-auto">
+              Rejoignez KRILI aujourd'hui et simplifiez votre recherche de logement étudiant
+          </p>
+          <div class="flex flex-col sm:flex-row gap-5 justify-center">
+              <a routerLink="/register/etudiant" class="btn-primary bg-white" style="color: var(--accent);">
+                  Je suis étudiant
+              </a>
+              <a routerLink="/register/proprietaire" class="btn-secondary border-white text-white hover:bg-white hover:text-accent">
+                  Je suis propriétaire
+              </a>
+          </div>
+      </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="py-16 md:py-24">
+      <div class="container mx-auto px-4">
+          <div class="text-center mb-16">
+              <h2 class="text-3xl font-bold mb-4 section-title" style="color: var(--text);">Ce que disent nos utilisateurs</h2>
+              <p class="text-lg max-w-3xl mx-auto" style="color: var(--text-light);">
+                  Découvrez les expériences de nos étudiants et propriétaires
+              </p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div class="card p-6">
+                  <div class="flex items-center mb-4">
+                      <div class="w-12 h-12 rounded-full overflow-hidden bg-primary-light flex items-center justify-center">
+                          <i class="fas fa-user text-xl" style="color: var(--primary);"></i>
+                      </div>
+                      <div class="ml-4">
+                          <h4 class="font-semibold" style="color: var(--text);">Yassine Chairi</h4>
+                          <p class="text-sm" style="color: var(--text-light);">Étudiante en droit</p>
+                      </div>
+                  </div>
+                  <div class="mb-4">
+                      <div class="flex">
+                          <i class="fas fa-star" style="color: var(--accent);"></i>
+                          <i class="fas fa-star" style="color: var(--accent);"></i>
+                          <i class="fas fa-star" style="color: var(--accent);"></i>
+                          <i class="fas fa-star" style="color: var(--accent);"></i>
+                          <i class="fas fa-star" style="color: var(--accent);"></i>
+                      </div>
+                  </div>
+                  <p style="color: var(--text-light);">
+                      "J'ai trouvé mon studio à 5 minutes à pied de mon université en moins de 2 jours ! Le processus de réservation était simple et la communication avec le propriétaire a été facilitée par la plateforme."
+                  </p>
+              </div>
+              <div class="card p-6">
+                  <div class="flex items-center mb-4">
+                      <div class="w-12 h-12 rounded-full overflow-hidden bg-primary-light flex items-center justify-center">
+                          <i class="fas fa-user-tie text-xl" style="color: var(--primary);"></i>
+                      </div>
+                      <div class="ml-4">
+                          <h4 class="font-semibold" style="color: var(--text);">Ali Moussaoui</h4>
+                          <p class="text-sm" style="color: var(--text-light);">Propriétaire</p>
+                      </div>
+                  </div>
+                  <div class="mb-4">
+                      <div class="flex">
+                          <i class="fas fa-star" style="color: var(--accent);"></i>
+                          <i class="fas fa-star" style="color: var(--accent);"></i>
+                          <i class="fas fa-star" style="color: var(--accent);"></i>
+                          <i class="fas fa-star" style="color: var(--accent);"></i>
+                          <i class="fas fa-star" style="color: var(--accent);"></i>
+                      </div>
+                  </div>
+                  <p style="color: var(--text-light);">
+                      "Grâce à KRILI, j'ai pu louer mes trois appartements à des étudiants sérieux très rapidement. La vérification des profils me donne une tranquillité d'esprit que je n'avais pas avant."
+                  </p>
+              </div>
+              <div class="card p-6">
+                  <div class="flex items-center mb-4">
+                      <div class="w-12 h-12 rounded-full overflow-hidden bg-primary-light flex items-center justify-center">
+                          <i class="fas fa-user-graduate text-xl" style="color: var(--primary);"></i>
+                      </div>
+                      <div class="ml-4">
+                          <h4 class="font-semibold" style="color: var(--text);">Barhrouj Saad</h4>
+                          <p class="text-sm" style="color: var(--text-light);">Étudiant en ingénierie</p>
+                      </div>
+                  </div>
+                  <div class="mb-4">
+                      <div class="flex">
+                          <i class="fas fa-star" style="color: var(--accent);"></i>
+                          <i class="fas fa-star" style="color: var(--accent);"></i>
+                          <i class="fas fa-star" style="color: var(--accent);"></i>
+                          <i class="fas fa-star" style="color: var(--accent);"></i>
+                          <i class="fas fa-star-half-alt" style="color: var(--accent);"></i>
+                      </div>
+                  </div>
+                  <p style="color: var(--text-light);">
+                      "Les filtres de recherche m'ont permis de trouver exactement ce que je cherchais : un logement meublé avec une bonne connexion internet et proche des transports. Je recommande !"
+                  </p>
+              </div>
+          </div>
+      </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-16" style="background-color: var(--background-alt);">
+      <div class="container mx-auto px-4">
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+              <div>
+                  <div class="flex items-center mb-4">
+                      <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M3 9L12 4L21 9L12 14L3 9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="stroke: var(--primary);"/>
+                          <path d="M5 11V17L12 21L19 17V11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="stroke: var(--primary);"/>
+                      </svg>
+                      <h1 class="text-2xl font-bold ml-2" style="color: var(--primary);">KRILI</h1>
+                  </div>
+                  <p class="text-sm" style="color: var(--text-light);">
+                      La plateforme qui connecte étudiants et propriétaires pour simplifier la recherche de logement.
+                  </p>
+              </div>
+              <div>
+                  <h4 class="text-lg font-semibold mb-4" style="color: var(--text);">Liens rapides</h4>
+                  <ul class="space-y-2 text-sm">
+                      <li><a href="#" style="color: var(--text-light);" class="hover:underline">Accueil</a></li>
+                      <li><a (click)="scrollToSection('fonctionnalites')" style="color: var(--text-light);" class="hover:underline cursor-pointer">Fonctionnalités</a></li>
+                      <li><a (click)="scrollToSection('comment-ca-marche')" style="color: var(--text-light);" class="hover:underline cursor-pointer">Comment ça marche</a></li>
+                      <li><a href="#" style="color: var(--text-light);" class="hover:underline">À propos</a></li>
+                  </ul>
+              </div>
+              <div>
+                  <h4 class="text-lg font-semibold mb-4" style="color: var(--text);">Pour les étudiants</h4>
+                  <ul class="space-y-2 text-sm">
+                      <li><a routerLink="/register/etudiant" style="color: var(--text-light);" class="hover:underline">Créer un compte</a></li>
+                      <li><a href="#" style="color: var(--text-light);" class="hover:underline">Rechercher un logement</a></li>
+                      <li><a href="#" style="color: var(--text-light);" class="hover:underline">FAQ étudiants</a></li>
+                      <li><a href="#" style="color: var(--text-light);" class="hover:underline">Aides au logement</a></li>
+                  </ul>
+              </div>
+              <div>
+                  <h4 class="text-lg font-semibold mb-4" style="color: var(--text);">Pour les propriétaires</h4>
+                  <ul class="space-y-2 text-sm">
+                      <li><a routerLink="/register/proprietaire" style="color: var(--text-light);" class="hover:underline">Créer un compte</a></li>
+                      <li><a routerLink="/register/proprietaire" style="color: var(--text-light);" class="hover:underline">Publier un logement</a></li>
+                      <li><a href="#" style="color: var(--text-light);" class="hover:underline">FAQ propriétaires</a></li>
+                      <li><a href="#proprietaires" style="color: var(--text-light);" class="hover:underline">Nos options de visibilité</a></li>
+                  </ul>
+              </div>
+          </div>
+          <div class="border-t mt-10 pt-6 text-center text-sm" style="border-color: var(--border); color: var(--text-light);">
+              <p>© {{currentYear}} KRILI. Tous droits réservés. | <a href="#" class="hover:underline">Mentions légales</a> | <a href="#" class="hover:underline">Politique de confidentialité</a></p>
+          </div>
+      </div>
+  </footer>
+</div>

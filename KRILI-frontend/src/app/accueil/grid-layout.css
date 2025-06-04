@@ -1,0 +1,94 @@
+/* Styles de grille pour KRILI */
+
+/* Grille de base pour les annonces */
+.listings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Grille pour les annonces premium avec effet spécial */
+.premium-listings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.75rem;
+  margin-top: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+/* Grille pour les appartements en vedette */
+.featured-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Grille avec colonnes spéciales pour mise en page avancée */
+.special-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+/* Responsive : tablettes */
+@media (min-width: 768px) {
+  .special-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Responsive : desktop */
+@media (min-width: 1024px) {
+  .special-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .wide-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Grille pour les statistiques/infos */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+/* Grille pour la mise en page en deux colonnes */
+.two-columns-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .two-columns-grid {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+/* Grille pour dashboard */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: 3fr 1fr;
+  }
+}
+
+/* Animation pour les transitions de grille */
+.grid-item {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.grid-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}

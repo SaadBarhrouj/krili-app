@@ -1,0 +1,334 @@
+/* src/app/layout/header/header.component.css */
+
+/* Variables de couleur */
+:root {
+  --primary: #2563EB;
+  --primary-dark: #1E40AF;
+  --primary-light: #93C5FD;
+  --accent: #FF5A19;
+  --accent-dark: #E64A14;
+  --background: #FFFFFF;
+  --background-alt: #F3F4F6;
+  --text: #1F2937;
+  --text-light: #6B7280;
+  --border: #E5E7EB;
+}
+
+/* Style de base du header */
+.app-header-student {
+  background-color: var(--background);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.98);
+  transition: all 0.3s ease;
+  border-bottom: 1px solid var(--border);
+  padding: 0.75rem 0;
+}
+
+/* Container du header */
+.header-container-student {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1rem;
+}
+
+/* Logo et texte */
+.logo-link-student {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  font-weight: bold;
+  color: var(--primary);
+  transition: transform 0.3s ease;
+}
+
+.logo-link-student:hover {
+  transform: translateY(-2px);
+}
+
+.logo-icon-student {
+  height: 38px;
+  width: 38px;
+  color: var(--primary);
+  margin-right: 0.75rem;
+}
+
+.logo-text-student {
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--primary);
+  margin: 0;
+}
+
+/* Navigation et actions utilisateur */
+.user-actions-student {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+/* Liens de navigation */
+.nav-link-student {
+  position: relative;
+  color: var(--text);
+  text-decoration: none;
+  padding: 0.75rem 1.25rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border-radius: 0.25rem;
+  border-bottom: 2px solid transparent;
+  margin-right: 0.75rem;
+}
+
+.nav-link-student:hover {
+  color: var(--primary);
+  background-color: rgba(37, 99, 235, 0.05);
+  transform: translateY(-2px);
+}
+
+.active-nav-link-student {
+  color: var(--primary);
+  font-weight: 600;
+  border-bottom: 2px solid var(--primary);
+  background-color: rgba(37, 99, 235, 0.08);
+}
+
+/* Badge de notification */
+.notification-icon-container-student {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification-badge-student {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: var(--accent);
+  color: white;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  min-width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  font-weight: 600;
+  border: 2px solid white;
+  box-shadow: 0 2px 5px rgba(255, 90, 25, 0.4);
+}
+
+/* Bouton utilisateur */
+.user-button-student {
+  display: flex;
+  align-items: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.3s ease;
+}
+
+.user-button-student:hover {
+  background-color: var(--background-alt);
+}
+
+.user-avatar-in-button-student {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--primary-light);
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2);
+}
+
+.user-button-student:hover .user-avatar-in-button-student {
+  transform: scale(1.1);
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+}
+
+.user-name-in-button-student {
+  margin-left: 0.75rem;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--text);
+}
+
+.dropdown-arrow-student {
+  margin-left: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--text-light);
+  transition: transform 0.3s ease;
+}
+
+.rotate-180 {
+  transform: rotate(180deg);
+}
+
+/* Menu déroulant */
+.dropdown-menu-student {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  width: 260px;
+  background-color: white;
+  border-radius: 0.95rem;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+  z-index: 50;
+  overflow: hidden;
+  animation: dropdownFadeIn 0.3s ease;
+  border: 1px solid var(--border);
+}
+
+@keyframes dropdownFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dropdown-user-info-student {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+  background-color: var(--background-alt);
+}
+
+.dropdown-user-greeting {
+  font-size: 0.8rem;
+  color: var(--text-light);
+  margin: 0 0 0.25rem 0;
+}
+
+.dropdown-user-name-detail {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dropdown-divider-student {
+  margin: 0;
+  border: 0;
+  height: 1px;
+  background-color: var(--border);
+}
+
+.dropdown-item-student {
+  display: flex;
+  align-items: center;
+  padding: 0.85rem 1.25rem;
+  color: var(--text);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-size: 1.05rem;
+}
+
+.dropdown-item-student:hover {
+  background-color: var(--background-alt);
+  padding-left: 1.5rem;
+  color: var(--primary);
+}
+
+.dropdown-item-icon-student {
+  margin-right: 0.9rem;
+  width: 1.1rem;
+  color: var(--text-light);
+  transition: transform 0.2s ease;
+}
+
+.dropdown-item-student:hover .dropdown-item-icon-student {
+  color: var(--primary);
+  transform: scale(1.15);
+}
+
+/* Style spécial pour le bouton de déconnexion */
+.logout-item-student {
+  color: #EF4444;
+}
+
+.logout-item-student .dropdown-item-icon-student {
+  color: #EF4444;
+}
+
+.logout-item-student:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+/* Style des boutons CTA */
+.btn-secondary, .btn-accent {
+  border-radius: 0.5rem;
+  padding: 0.65rem 1.2rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 0.95rem;
+}
+
+.btn-secondary {
+  background-color: white;
+  color: var(--text);
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.btn-secondary:hover {
+  background-color: var(--background-alt);
+  color: var(--primary);
+  border-color: var(--primary-light);
+}
+
+.btn-accent {
+  background-color: var(--accent);
+  color: white;
+  box-shadow: 0 1px 4px rgba(255, 90, 25, 0.15);
+}
+
+.btn-accent:hover {
+  background-color: var(--accent-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(255, 90, 25, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .logo-icon-student {
+    height: 32px;
+    width: 32px;
+  }
+  
+  .logo-text-student {
+    font-size: 1.5rem;
+  }
+  
+  .header-container-student {
+    padding: 0 1rem;
+  }
+  
+  .user-name-in-button-student {
+    display: none;
+  }
+  
+  .nav-link-student {
+    padding: 0.65rem 1rem;
+    font-size: 1rem;
+  }
+  
+  .user-avatar-in-button-student {
+    width: 36px;
+    height: 36px;
+  }
+}

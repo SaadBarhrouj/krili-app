@@ -1,0 +1,205 @@
+/* Style de la page de notifications, inspiré du design global de KRILI */
+.notifications-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Style pour chaque notification */
+.notification-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  border-radius: 12px;
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+  position: relative;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.notification-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Style pour les notifications non lues */
+.notification-item.unread {
+  background: linear-gradient(90deg, rgba(37, 99, 235, 0.08) 0%, rgba(37, 99, 235, 0.02) 100%);
+  border-left: 3px solid var(--primary);
+}
+
+/* Wrapper pour l'icône de notification */
+.notification-icon-wrapper {
+  width: 42px;
+  height: 42px;
+  min-width: 42px; /* Pour éviter que l'icone ne se rétrécisse */
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.12) 0%, rgba(37, 99, 235, 0.05) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.15);
+}
+
+.notification-icon-wrapper i {
+  font-size: 1.2rem;
+}
+
+/* Contenu de la notification */
+.notification-content {
+  flex: 1;
+  padding-right: 1rem;
+}
+
+.notification-message {
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+  color: var(--text);
+}
+
+.notification-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Actions pour chaque notification */
+.notification-actions {
+  display: flex;
+  align-items: center;
+}
+
+.btn-mark-read {
+  background-color: transparent;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-light);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-mark-read:hover {
+  background-color: rgba(37, 99, 235, 0.1);
+  color: var(--primary);
+}
+
+/* Bouton "Tout marquer comme lu" */
+.btn-secondary {
+  background-color: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.btn-secondary:hover {
+  background-color: var(--background-alt);
+  border-color: var(--primary-light);
+  color: var(--primary);
+}
+
+/* Pagination */
+.pagination-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pagination-button:hover:not(:disabled) {
+  background-color: var(--background-alt);
+  color: var(--primary);
+  border-color: var(--primary-light);
+}
+
+.pagination-button.active-page {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  border-color: var(--primary);
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+}
+
+.pagination-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-button i {
+  font-size: 0.8rem;
+}
+
+/* État vide */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+}
+
+.empty-state i {
+  font-size: 3.5rem;
+  margin-bottom: 1.25rem;
+  color: var(--text-light);
+  opacity: 0.5;
+}
+
+/* Message d'erreur */
+.alert-danger {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-left: 4px solid #ef4444;
+  padding: 1rem;
+  border-radius: 6px;
+  color: #b91c1c;
+  margin-bottom: 1.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .notification-item {
+    padding: 1rem;
+  }
+  
+  .notification-icon-wrapper {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+  }
+  
+  .notification-message {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .notification-meta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .notification-meta a {
+    margin-left: 0;
+  }
+}

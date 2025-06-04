@@ -1,0 +1,286 @@
+/* Styles généraux et pour utiliser les variables CSS --primary, etc. */
+:host {
+  display: block;
+}
+
+/* Conteneur principal - utilise les mêmes dimensions que le header */
+.reservations-container {
+  position: relative;
+  width: 100%;
+}
+
+/* Header de la page */
+.page-header {
+  border-bottom: 1px solid var(--border);
+}
+
+.page-header h1 {
+  color: var(--text);
+}
+
+.page-header p {
+  color: var(--text-light);
+}
+
+/* Section des filtres */
+.filter-section {
+  background-color: var(--background-alt);
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+/* Boutons de filtre */
+.filter-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--border);
+  background-color: var(--background);
+  color: var(--text-light);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.filter-btn:hover {
+  background-color: var(--background-alt);
+  border-color: var(--primary-light);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.filter-btn.filter-btn-active {
+  background-color: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+:host-context(.dark) .filter-btn {
+  background-color: var(--background);
+  border-color: var(--border);
+  color: var(--text-light);
+}
+
+:host-context(.dark) .filter-btn:hover {
+  background-color: var(--border);
+  border-color: var(--primary);
+  color: var(--primary-light);
+}
+
+:host-context(.dark) .filter-btn.filter-btn-active {
+  background-color: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+/* Message d'état vide */
+.empty-state {
+  border: 1px dashed var(--border);
+  border-radius: 0.75rem;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+}
+
+.cta-button {
+  background-color: var(--primary);
+  color: white;
+  transition: background-color 0.2s;
+  margin-top: 1rem;
+  display: inline-flex;
+  align-items: center;
+}
+
+.cta-button:hover {
+  background-color: var(--primary-dark);
+}
+
+/* Carte de réservation */
+.reservation-card {
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background-color: var(--background);
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.reservation-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+:host-context(.dark) .reservation-card {
+  background-color: var(--background-alt);
+  border-color: var(--border);
+}
+
+.reservation-card-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  padding: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .reservation-card-grid {
+    grid-template-columns: 1fr 3fr;
+  }
+}
+
+/* Image du logement */
+.reservation-image-wrapper {
+  height: 200px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .reservation-image-wrapper {
+    height: 100%;
+    min-height: 220px;
+  }
+}
+
+.reservation-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.reservation-image:hover {
+  transform: scale(1.05);
+}
+
+/* Détails de la réservation */
+.reservation-details-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.reservation-details {
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Badge de statut */
+.status-pill {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  white-space: nowrap;
+  text-align: center;
+}
+
+/* Couleurs des badges de statut */
+.status-pending { background-color: #FEF3C7; color: #92400E; border: 1px solid #FDE68A; }
+.status-confirmed { background-color: #DCFCE7; color: #166534; border: 1px solid #BBF7D0; }
+.status-ongoing { background-color: #DBEAFE; color: #1E40AF; border: 1px solid #BFDBFE; }
+.status-completed { background-color: #F3F4F6; color: #4B5563; border: 1px solid #E5E7EB; }
+.status-canceled-etudiant { background-color: #FEE2E2; color: #B91C1C; border: 1px solid #FECACA; }
+.status-canceled-proprio { background-color: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; }
+.status-disputed { background-color: #FFFBEB; color: #B45309; border: 1px solid #FDE68A; }
+.status-unknown { background-color: #E5E7EB; color: #374151; border: 1px solid #D1D5DB; }
+
+:host-context(.dark) .status-pending { background-color: rgba(245,158,11,0.2); color: #FCD34D; border-color: rgba(252,211,77,0.4); }
+:host-context(.dark) .status-confirmed { background-color: rgba(16,185,129,0.2); color: #6EE7B7; border-color: rgba(52,211,153,0.4); }
+:host-context(.dark) .status-ongoing { background-color: rgba(59,130,246,0.2); color: #93C5FD; border-color: rgba(96,165,250,0.4); }
+:host-context(.dark) .status-completed { background-color: rgba(107,114,128,0.2); color: #9CA3AF; border-color: rgba(156,163,175,0.4); }
+:host-context(.dark) .status-canceled-etudiant { background-color: rgba(239,68,68,0.2); color: #FCA5A5; border-color: rgba(248,113,113,0.4); }
+:host-context(.dark) .status-canceled-proprio { background-color: rgba(220,38,38,0.2); color: #F87171; border-color: rgba(248,113,113,0.4); }
+:host-context(.dark) .status-disputed { background-color: rgba(217,119,6,0.2); color: #FDBA74; border-color: rgba(251,191,36,0.4); }
+:host-context(.dark) .status-unknown { background-color: rgba(75,85,99,0.2); color: #D1D5DB; border-color: rgba(107,114,128,0.4); }
+
+/* Boîtes de message */
+.message-box {
+  border-radius: 0.375rem;
+  margin-top: 1rem;
+}
+
+.student-message {
+  background-color: var(--background-alt);
+  border: 1px solid var(--border);
+}
+
+.owner-message {
+  background-color: rgba(var(--primary-rgb), 0.05);
+  border: 1px solid rgba(var(--primary-rgb), 0.2);
+}
+
+/* Footer d'actions */
+.reservation-actions-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--border);
+  background-color: rgba(0,0,0,0.01);
+}
+
+:host-context(.dark) .reservation-actions-footer {
+  background-color: rgba(255,255,255,0.01);
+}
+
+/* Message d'erreur d'annulation */
+.cancel-error-message {
+  color: #dc2626;
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-right: auto;
+  display: flex;
+  align-items: center;
+}
+
+/* Bouton d'annulation */
+.btn-cancel {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  border-radius: 0.375rem;
+  border: 1px solid #ef4444;
+  color: #ef4444;
+  background-color: transparent;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-cancel:hover:not(:disabled) {
+  background-color: #ef4444;
+  color: white;
+  transform: translateY(-1px);
+}
+
+.btn-cancel:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Bouton de contact */
+.btn-contact-proprio {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--primary);
+  background-color: var(--primary);
+  color: white;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-contact-proprio:hover:not(:disabled) {
+  background-color: var(--primary-dark);
+  border-color: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+.btn-contact-proprio:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

@@ -1,0 +1,164 @@
+<div class="messages-container p-4 md:p-6 lg:p-8">
+  <!-- En-tête de la page -->
+  <div class="page-header mb-6 pb-4 border-b border-[var(--border)]">
+    <h1 class="text-2xl md:text-3xl font-bold text-[var(--text)]">Messages</h1>
+    <p class="text-sm md:text-base text-[var(--text-light)]">Communiquez avec les étudiants intéressés par vos logements</p>
+  </div>
+
+  <!-- Indicateur de chargement -->
+  <div *ngIf="isLoading" class="loading-indicator flex flex-col items-center justify-center py-12">
+    <svg class="w-12 h-12 animate-spin text-blue-600" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+    <p class="mt-4 text-[var(--text)]">Chargement des messages...</p>
+  </div>
+
+  <!-- Message d'erreur -->
+  <div *ngIf="!isLoading && errorMessage" class="alert alert-danger p-4 bg-red-100 text-red-800 border border-red-200 rounded mb-6">
+    <i class="fas fa-exclamation-triangle mr-2"></i> {{ errorMessage }}
+  </div>
+
+  <!-- Contenu principal - Interface de Messages -->
+  <div *ngIf="!isLoading && !errorMessage" class="messages-interface">
+    <div class="flex flex-col md:flex-row h-[calc(100vh-240px)] min-h-[500px] md:space-x-4">
+      
+      <!-- Liste des conversations (gauche) -->
+      <div class="conversations-list md:w-1/3 bg-white border border-[var(--border)] rounded-lg overflow-hidden mb-4 md:mb-0">
+        <div class="p-4 border-b border-[var(--border)]">
+          <div class="relative">
+            <input 
+              type="text" 
+              placeholder="Rechercher une conversation..." 
+              class="w-full pl-10 pr-4 py-2 border border-[var(--border)] rounded"
+              [(ngModel)]="searchTerm"
+              (input)="filterConversations()"
+            >
+            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+          </div>
+        </div>
+        
+        <div class="overflow-y-auto h-[calc(100vh-340px)] min-h-[400px]">
+          <!-- Liste des conversations -->
+          <div *ngIf="filteredConversations.length > 0; else noConversations">
+            <button 
+              *ngFor="let conversation of filteredConversations" 
+              (click)="selectConversation(conversation)"
+              class="conversation-item w-full text-left flex items-center p-4 border-b border-[var(--border)] hover:bg-gray-50"
+              [class.active-conversation]="selectedConversation && selectedConversation.id === conversation.id"
+            >
+              <!-- Avatar -->
+              <div class="avatar h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center mr-3">
+                <i class="fas fa-user text-gray-500"></i>
+              </div>
+              <!-- Info -->
+              <div class="flex-grow min-w-0">
+                <div class="flex justify-between items-center mb-1">
+                  <h3 class="font-medium truncate text-[var(--text)]">{{ conversation.etudiant.nom }}</h3>
+                  <span class="text-xs text-[var(--text-light)]">{{ conversation.lastMessageDate | date:'HH:mm' }}</span>
+                </div>
+                <p class="text-sm truncate text-[var(--text-light)]">
+                  <!-- Si nouveau message non lu -->
+                  <span *ngIf="conversation.unreadCount > 0" class="font-semibold text-[var(--text)]">
+                    {{ conversation.lastMessage }}
+                  </span>
+                  <!-- Si déjà lu -->
+                  <span *ngIf="conversation.unreadCount === 0">
+                    {{ conversation.lastMessage }}
+                  </span>
+                </p>
+              </div>
+              <!-- Indicateur de message non lu -->
+              <span *ngIf="conversation.unreadCount > 0" class="ml-2 bg-blue-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                {{ conversation.unreadCount }}
+              </span>
+            </button>
+          </div>
+          
+          <ng-template #noConversations>
+            <div class="p-6 text-center">
+              <p class="text-[var(--text-light)]">Aucune conversation trouvée.</p>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+      
+      <!-- Zone de conversation (droite) -->
+      <div class="conversation-area md:w-2/3 bg-white border border-[var(--border)] rounded-lg overflow-hidden flex flex-col">
+        <!-- Aucune conversation sélectionnée -->
+        <div *ngIf="!selectedConversation" class="h-full flex flex-col items-center justify-center p-6">
+          <div class="text-center">
+            <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+            </svg>
+            <h3 class="mt-4 text-lg font-medium text-[var(--text)]">Démarrer une conversation</h3>
+            <p class="mt-1 text-[var(--text-light)]">Sélectionnez une conversation à gauche pour commencer à échanger.</p>
+          </div>
+        </div>
+        
+        <!-- Conversation sélectionnée -->
+        <div *ngIf="selectedConversation" class="flex flex-col h-full">
+          <!-- En-tête de la conversation -->
+          <div class="conversation-header flex items-center p-4 border-b border-[var(--border)]">
+            <div class="avatar h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center mr-3">
+              <i class="fas fa-user text-gray-500"></i>
+            </div>
+            <div>
+              <h3 class="font-medium text-[var(--text)]">{{ selectedConversation.etudiant.nom }}</h3>
+              <p class="text-xs text-[var(--text-light)]">
+                <i class="fas fa-home mr-1"></i>{{ selectedConversation.logement.titre }}
+              </p>
+            </div>
+            <div class="ml-auto">
+              <button class="p-2 text-[var(--text-light)] hover:text-[var(--text)] rounded-full hover:bg-gray-100">
+                <i class="fas fa-ellipsis-v"></i>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Corps des messages -->
+          <div class="messages-body flex-grow p-4 overflow-y-auto bg-gray-50" style="height: calc(100vh - 460px); min-height: 300px;">
+            <div *ngFor="let message of selectedConversation.messages" class="mb-4">
+              <!-- Message envoyé par l'utilisateur -->
+              <div *ngIf="message.isFromMe" class="flex justify-end">
+                <div class="message-bubble sent max-w-[80%] p-3 bg-blue-500 text-white rounded-lg rounded-tr-none">
+                  <p>{{ message.text }}</p>
+                  <span class="block text-right text-xs mt-1 opacity-80">{{ message.date | date:'HH:mm' }}</span>
+                </div>
+              </div>
+              
+              <!-- Message reçu -->
+              <div *ngIf="!message.isFromMe" class="flex justify-start">
+                <div class="message-bubble received max-w-[80%] p-3 bg-white border border-[var(--border)] rounded-lg rounded-tl-none">
+                  <p class="text-[var(--text)]">{{ message.text }}</p>
+                  <span class="block text-right text-xs mt-1 text-[var(--text-light)]">{{ message.date | date:'HH:mm' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Zone de saisie -->
+          <div class="message-input p-4 border-t border-[var(--border)]">
+            <form (submit)="sendMessage()" class="flex">
+              <input 
+                type="text" 
+                [(ngModel)]="newMessage" 
+                name="newMessage"
+                placeholder="Tapez votre message..." 
+                class="flex-grow p-3 border border-[var(--border)] rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                [disabled]="sendingInProgress"
+              >
+              <button 
+                type="submit" 
+                class="px-4 bg-blue-500 text-white rounded-r-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                [disabled]="!newMessage.trim() || sendingInProgress"
+              >
+                <i class="fas" [class.fa-paper-plane]="!sendingInProgress" [class.fa-spinner]="sendingInProgress" [class.fa-spin]="sendingInProgress"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

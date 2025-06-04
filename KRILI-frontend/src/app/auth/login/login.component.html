@@ -1,0 +1,96 @@
+<!-- src/app/auth/login/login.component.html -->
+<div class="login-page-container">
+	<div class="login-form-container">
+		<!-- Section Logo et Titre KRILI -->
+		<div class="text-center logo-container">
+			<div class="flex justify-center">
+				<svg class="h-12 w-12 md:h-14 md:w-14" style="color: var(--primary)" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<path d="M3 9L12 4L21 9L12 14L3 9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+					<path d="M5 11V17L12 21L19 17V11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+				</svg>
+			</div>
+			<h2 class="mt-2 text-2xl md:text-3xl font-bold" style="color: var(--primary);">KRILI</h2>
+			<p class="mt-1 text-sm md:text-base" style="color: var(--text-light);">Le logement étudiant simplifié</p>
+		</div>
+
+		<!-- Section Connexion -->
+		<div class="mt-2">
+			<h1 class="text-center text-xl md:text-2xl font-extrabold">Connexion</h1>
+			<!-- Formulaire Angular -->
+			<form class="mt-5 space-y-5 px-1 sm:px-4" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+				<!-- Champ Email -->
+				<div>
+					<label for="email" class="block text-sm font-medium mb-1">Adresse email</label>
+					<input id="email" name="email" type="email" autocomplete="email" required
+						class="input-field mt-1" placeholder="nom@exemple.fr" formControlName="email"
+						[class.is-invalid]="email?.invalid && (email?.dirty || email?.touched)">
+					<div *ngIf="email?.invalid && (email?.dirty || email?.touched)" class="invalid-feedback">
+						<div *ngIf="email?.errors?.['required']">L'email est requis.</div>
+						<div *ngIf="email?.errors?.['email']">Format d'email invalide.</div>
+					</div>
+				</div>
+				<!-- Champ Mot de passe -->
+				<div>
+					<div class="flex items-center justify-between mb-1">
+						<label for="password" class="block text-sm font-medium">Mot de passe</label>
+						<a routerLink="/mot-de-passe-oublie" class="text-xs md:text-sm font-medium hover:underline">Mot de passe oublié ?</a>
+					</div>
+					<div class="relative mt-1">
+						<input id="password" name="password" [type]="passwordFieldType" autocomplete="current-password" required
+							class="input-field pr-10" placeholder="••••••••" formControlName="password"
+							[class.is-invalid]="password?.invalid && (password?.dirty || password?.touched)">
+						<button type="button" (click)="togglePasswordVisibility()" class="absolute inset-y-0 right-0 pr-3 flex items-center focus:outline-none">
+							<i class="fas" [ngClass]="passwordFieldType === 'password' ? 'fa-eye' : 'fa-eye-slash'"></i>
+						</button>
+					</div>
+					<div *ngIf="password?.invalid && (password?.dirty || password?.touched)" class="invalid-feedback">
+						<div *ngIf="password?.errors?.['required']">Le mot de passe est requis.</div>
+					</div>
+				</div>
+				<!-- Message d'erreur ou succès -->
+				<div *ngIf="errorMessage" class="alert alert-danger">
+					{{ errorMessage }}
+				</div>
+				<div *ngIf="successMessage" class="alert alert-success">
+					{{ successMessage }}
+				</div>
+				<!-- Bouton de soumission -->
+				<div class="pt-1">
+					<button type="submit" class="btn-accent" [disabled]="loginForm.invalid || isLoading">
+						<span *ngIf="!isLoading">Se connecter</span>
+						<span *ngIf="isLoading">
+							<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+								<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+								<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+							</svg>
+							Connexion...
+						</span>
+					</button>
+				</div>
+			</form>
+		</div>
+
+		<!-- Section Inscription -->
+		<div class="mt-5">
+			<div class="relative">
+				<div class="absolute inset-0 flex items-center">
+					<div class="w-full border-t" style="border-color: var(--border);"></div>
+				</div>
+				<div class="relative flex justify-center text-xs md:text-sm">
+					<span class="px-4 separator-text">OU</span>
+				</div>
+			</div>
+			<div class="mt-5">
+				<h2 class="text-center text-lg font-bold mb-4">Créer un compte</h2>
+				<div class="signup-option">
+					<a routerLink="/register/etudiant" class="btn-primary student">
+						S'inscrire comme Étudiant
+					</a>
+					<a routerLink="/register/proprietaire" class="btn-secondary">
+						S'inscrire comme Propriétaire
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

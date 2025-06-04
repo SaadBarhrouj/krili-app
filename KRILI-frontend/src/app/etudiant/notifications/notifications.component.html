@@ -1,0 +1,95 @@
+<!-- KRILI-frontend\src\app\etudiant\notifications\notifications.component.html -->
+<div class="notifications-container p-4 md:p-6 lg:p-8">
+  <!-- En-t??te de la page -->
+  <div class="flex flex-wrap justify-between items-center mb-6 gap-4">
+    <h1 class="text-2xl font-bold" style="color: var(--text);">Mes Notifications</h1>
+    <!-- Bouton "Tout marquer comme lu" : s'affiche seulement s'il y a des notifications et au moins une non lue -->
+    <button *ngIf="hasUnreadNotifications"
+            (click)="onMarkAllAsRead()"
+            class="btn-secondary text-sm">
+      <i class="fas fa-check-double mr-2"></i>Tout marquer comme lu
+    </button>
+  </div>
+
+  <!-- Indicateur de chargement -->
+  <div *ngIf="isLoading" class="text-center py-10">
+    <svg class="animate-spin h-8 w-8 mx-auto" style="color: var(--primary);" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+    <p class="mt-2" style="color: var(--text-light);">Chargement des notifications...</p>
+  </div>
+
+  <!-- Message d'erreur -->
+  <div *ngIf="!isLoading && errorMessage" class="alert alert-danger">
+    <i class="fas fa-exclamation-triangle mr-2"></i> {{ errorMessage }}
+  </div>
+
+  <!-- Contenu principal des notifications -->
+  <div *ngIf="!isLoading && !errorMessage">
+    <!-- Liste des notifications -->
+    <div *ngIf="notificationsPage && notificationsPage.content && notificationsPage.content.length > 0; else noNotifications" class="space-y-3">
+      <!-- It??ration sur chaque notification -->
+      <div *ngFor="let notification of notificationsPage.content"
+           class="notification-item card"
+           [class.unread]="!notification.read">
+
+        <!-- Ic??ne de la notification -->
+        <div class="notification-icon-wrapper">
+          <i [ngClass]="getNotificationIcon(notification.type)"></i>
+        </div>
+
+        <!-- Contenu textuel de la notification -->
+        <div class="notification-content">
+          <p class="notification-message" [class.font-semibold]="!notification.read">{{ notification.message }}</p>
+          <div class="notification-meta">
+            <span class="text-xs" style="color: var(--text-light);">
+              <!-- Formatage de la date avec le pipe DatePipe -->
+              {{ notification.createdAt | date:'dd/MM/yyyy HH:mm' }}
+            </span>
+            <!-- Lien conditionnel vers le d??tail (logement ou propri??taire) -->
+            <a *ngIf="getNotificationLink(notification)" [routerLink]="getNotificationLink(notification)"
+               class="text-xs font-medium ml-3 hover:underline" style="color: var(--primary);">
+              Voir les détails <i class="fas fa-arrow-right text-xs ml-1"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Actions sur la notification (marquer comme lu) -->
+        <div class="notification-actions">
+          <button *ngIf="!notification.read"
+                  (click)="onMarkAsRead(notification)"
+                  class="btn-mark-read" title="Marquer comme lu">
+            <i class="fas fa-envelope-open"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Template ?? afficher si aucune notification n'est trouv??e -->
+    <ng-template #noNotifications>
+      <div class="text-center py-10 empty-state">
+        <i class="fas fa-bell-slash text-4xl mb-3 opacity-30"></i>
+        <p style="color: var(--text-light);">Vous n'avez aucune notification pour le moment.</p>
+      </div>
+    </ng-template>
+
+    <!-- Contr??les de Pagination -->
+    <nav *ngIf="notificationsPage && notificationsPage.totalPages && notificationsPage.totalPages > 1" aria-label="Pagination" class="mt-8 flex justify-center items-center space-x-2">
+      <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 0" class="pagination-button">
+        <i class="fas fa-chevron-left"></i> Pr??c.
+      </button>
+      <!-- Boucle pour afficher les num??ros de page -->
+      <ng-container *ngFor="let pageNum of getPages()">
+        <button (click)="goToPage(pageNum)"
+                class="pagination-button"
+                [class.active-page]="currentPage === pageNum">
+          {{ pageNum + 1 }} <!-- Afficher le num??ro de page (base 1 pour l'utilisateur) -->
+        </button>
+      </ng-container>
+      <button (click)="goToPage(currentPage + 1)" [disabled]="!notificationsPage || currentPage === (notificationsPage.totalPages - 1)" class="pagination-button">
+        Suiv. <i class="fas fa-chevron-right"></i>
+      </button>
+    </nav>
+  </div>
+</div>

@@ -1,0 +1,124 @@
+<!-- src/app/etudiant/profil-etudiant/profil-etudiant.component.html -->
+<div class="profile-page-container">
+  <div class="page-header">
+    <h1>Mon Profil Étudiant</h1>
+    <p>Gérez vos informations personnelles et académiques.</p>
+  </div>
+
+  <div *ngIf="isLoading && !etudiantProfile" class="loading-overlay">
+    <!-- ... indicateur de chargement ... -->
+  </div>
+
+  <div *ngIf="errorMessage && !isLoading" class="alert alert-danger">
+    <i class="fas fa-exclamation-triangle mr-2"></i> {{ errorMessage }}
+    <!-- Optionnel: bouton pour réessayer de charger si l'erreur est liée au chargement initial -->
+  </div>
+  <div *ngIf="successMessage && !isEditing" class="alert alert-success mb-6">
+    <i class="fas fa-check-circle mr-2"></i> {{ successMessage }}
+  </div>
+
+  <form *ngIf="etudiantProfile && !isLoading" [formGroup]="profileEditForm" (ngSubmit)="onSaveChanges()" class="profile-form card">
+    <div *ngIf="errorMessage && isEditing" class="alert alert-danger mb-6">{{ errorMessage }}</div>
+
+    <!-- Section Supérieure : Avatar, Nom, Boutons -->
+    <div class="profile-top-section">
+      <div class="avatar-edit-container">
+        <div class="avatar-display">
+          <img [src]="avatarDisplayUrl" alt="Avatar Étudiant" class="profile-avatar">
+          <label *ngIf="isEditing" for="avatarUpload" class="avatar-edit-overlay" title="Changer la photo">
+            <i class="fas fa-camera"></i><span>Changer</span>
+          </label>
+          <input *ngIf="isEditing" type="file" id="avatarUpload" class="hidden" accept="image/*" (change)="onAvatarSelected($event)">
+        </div>
+         <!-- Afficher l'ancien nom si en mode édition et le nom est modifié -->
+        <p *ngIf="isEditing && nomCtrl?.dirty && etudiantProfile?.nom !== nomCtrl?.value" class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            Ancien nom: {{ etudiantProfile?.nom }}
+        </p>
+      </div>
+
+      <div class="main-info-actions">
+        <div class="main-info">
+          <!-- En mode lecture, afficher etudiantProfile.nom, en mode édition, afficher la valeur du formulaire -->
+          <h2 class="user-name-display">{{ isEditing ? (nomCtrl?.value || 'Nom...') : (etudiantProfile.nom || 'Nom non défini') }}</h2>
+          <p class="user-email-display">{{ etudiantProfile.email }}</p>
+        </div>
+        <div class="action-buttons">
+          <button *ngIf="!isEditing" type="button" (click)="toggleEditMode()" class="btn btn-primary">
+            <i class="fas fa-edit mr-2"></i> Modifier
+          </button>
+          <div *ngIf="isEditing" class="flex gap-3">
+            <button type="button" (click)="toggleEditMode()" class="btn btn-secondary">Annuler</button>
+            <button type="submit" class="btn btn-accent" [disabled]="profileEditForm.invalid || isSubmitting">
+              <span *ngIf="!isSubmitting"><i class="fas fa-save mr-2"></i> Enregistrer</span>
+              <span *ngIf="isSubmitting" class="flex items-center justify-center">
+                <svg class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24"><!-- ... spinner SVG ... --></svg>Sauvegarde...
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-sections-container">
+      <!-- Section Informations Personnelles -->
+      <div class="form-section">
+        <h3 class="section-heading">Informations Personnelles</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+          <div class="form-group">
+            <label for="nom" class="form-label">Nom complet*</label>
+            <input type="text" id="nom" formControlName="nom" class="input-field" [readonly]="!isEditing" [ngClass]="{'input-field-disabled': !isEditing, 'is-invalid': nomCtrl?.invalid && nomCtrl?.touched && isEditing}">
+            <div *ngIf="nomCtrl?.invalid && nomCtrl?.touched && isEditing" class="invalid-feedback">Le nom est requis.</div>
+          </div>
+          <div class="form-group">
+            <label for="telephone" class="form-label">Téléphone</label>
+            <input type="tel" id="telephone" formControlName="telephone" class="input-field" [readonly]="!isEditing" [ngClass]="{'input-field-disabled': !isEditing}">
+            <!-- Pas de validation stricte pour le téléphone pour l'instant -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Informations Académiques -->
+      <div class="form-section">
+        <h3 class="section-heading">Informations Académiques</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+          <div class="form-group">
+            <label for="villeEtudeId" class="form-label">Ville d'étude</label>
+            <select *ngIf="isEditing" id="villeEtudeId" formControlName="villeEtudeId" class="input-field" (change)="onVilleForEditChange()" [ngClass]="{'is-invalid': villeEtudeIdCtrl?.invalid && villeEtudeIdCtrl?.touched && isEditing}">
+              <option [ngValue]="null">-- Non spécifiée --</option>
+              <option *ngFor="let ville of availableVillesForEdit" [value]="ville.id">{{ ville.nom }}</option>
+            </select>
+            <p *ngIf="!isEditing" class="input-field-disabled">{{ etudiantProfile.villeNom || 'Non renseignée' }}</p>
+            <div *ngIf="isLoadingVillesForEdit && isEditing" class="text-xs text-gray-500 mt-1">Chargement...</div>
+          </div>
+
+          <div class="form-group">
+            <label for="etablissementId" class="form-label">Établissement</label>
+            <select *ngIf="isEditing" id="etablissementId" formControlName="etablissementId" class="input-field" [ngClass]="{'is-invalid': etablissementIdCtrl?.invalid && etablissementIdCtrl?.touched && isEditing}">
+              <option [ngValue]="null">-- Non spécifié --</option>
+              <option *ngFor="let etab of availableEtablissementsForEdit" [value]="etab.id">{{ etab.nom }}</option>
+            </select>
+            <p *ngIf="!isEditing" class="input-field-disabled">{{ etudiantProfile.etablissementNom || 'Non renseigné' }}</p>
+            <div *ngIf="isLoadingEtablissementsForEdit && isEditing" class="text-xs text-gray-500 mt-1">Chargement...</div>
+             <div *ngIf="isEditing && profileEditForm.get('villeEtudeId')?.value && availableEtablissementsForEdit.length === 0 && !isLoadingEtablissementsForEdit" class="text-xs text-gray-500 mt-1">
+              Aucun établissement pour cette ville.
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="filiere" class="form-label">Filière</label>
+            <input type="text" id="filiere" formControlName="filiere" class="input-field" [readonly]="!isEditing" [ngClass]="{'input-field-disabled': !isEditing}">
+          </div>
+
+          <div class="form-group">
+            <label for="anneeEtude" class="form-label">Année d'étude</label>
+            <select *ngIf="isEditing" id="anneeEtude" formControlName="anneeEtude" class="input-field">
+                <option [ngValue]="null">-- Non spécifiée --</option>
+                <option *ngFor="let annee of anneesEtudeOptions" [value]="annee">{{ annee }}{{ annee === 1 ? 'ère' : 'ème' }} année</option>
+            </select>
+            <p *ngIf="!isEditing" class="input-field-disabled">{{ etudiantProfile.anneeEtude ? (etudiantProfile.anneeEtude + (etudiantProfile.anneeEtude === 1 ? 'ère année' : 'ème année')) : 'Non renseignée' }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

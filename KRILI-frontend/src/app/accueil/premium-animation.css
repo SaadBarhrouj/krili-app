@@ -1,0 +1,22 @@
+/* Animations pour les cartes premium */
+@keyframes premium-card-glow {
+  0% {
+    border-color: rgba(59, 130, 246, 0.3);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  }
+  100% {
+    border-color: rgba(59, 130, 246, 0.6);
+    box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Application de l'animation sur les cartes premium */
+.premium-card {
+  border: 1px solid rgba(59, 130, 246, 0.3) !important;
+  animation: premium-card-glow 3s infinite alternate;
+}
+
+.premium-card-mobile {
+  border: 1px solid rgba(59, 130, 246, 0.3) !important;
+  animation: premium-card-glow 3s infinite alternate;
+}

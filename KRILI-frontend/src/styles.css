@@ -1,0 +1,281 @@
+/* krili-frontend/src/styles.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---> Variables Globales & Styles de Base <--- */
+:root {
+  --primary: #2563EB; /* blue-600 */
+  --primary-dark: #1E40AF; /* blue-800 */
+  --primary-light: #93C5FD; /* blue-300 */
+  --accent: #FF5A19; /* Orange vif personnalisé */
+  --accent-dark: #E64A14; /* Plus foncé */
+  --secondary: #4ADE80; /* green-400 */
+  --secondary-dark: #34D399; /* green-500 */
+  --background: #FFFFFF; /* white */
+  --background-alt: #F3F4F6; /* gray-100 */
+  --text: #1F2937; /* gray-800 */
+  --text-light: #6B7280; /* gray-500 */
+  --border: #E5E7EB; /* gray-200 */
+}
+
+.dark { /* Appliqué sur <html> par AppComponent */
+  --primary: #3B82F6; /* blue-500 */
+  --primary-dark: #2563EB; /* blue-600 */
+  --primary-light: #60A5FA; /* blue-400 */
+  --accent: #FF5A19;
+  --accent-dark: #E64A14;
+  --secondary: #4ADE80;
+  --secondary-dark: #34D399;
+  --background: #111827; /* gray-900 */
+  --background-alt: #1F2937; /* gray-800 */
+  --text: #F9FAFB; /* gray-50 */
+  --text-light: #9CA3AF; /* gray-400 */
+  --border: #374151; /* gray-700 */
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--background);
+  color: var(--text);
+  margin: 0;
+  padding: 0;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Styles globaux pour les messages d'erreur Angular (GARDER) */
+.invalid-feedback {
+  display: none;
+  width: 100%;
+  margin-top: 0.25rem; /* mt-1 */
+  font-size: 0.875rem; /* text-sm */
+  color: #dc2626; /* text-red-600 */
+}
+.dark .invalid-feedback {
+  color: #f87171; /* text-red-400 */
+}
+/* S'applique quand l'input a la classe .is-invalid OU quand Angular le marque invalide/touché */
+/* Ces classes sont appliquées via [class.is-invalid] dans les templates */
+input.is-invalid + .invalid-feedback,
+input.ng-invalid.ng-touched + .invalid-feedback {
+  display: block;
+}
+
+/* Styles pour les alertes globales (GARDER) */
+.alert {
+  @apply p-3 md:p-4 mb-4 border rounded-md;
+}
+.alert-danger {
+  @apply text-red-800 bg-red-100 border-red-200;
+}
+.dark .alert-danger {
+  @apply text-red-300 border-red-700;
+  background-color: rgba(153, 27, 27, 0.2);
+}
+.alert-success {
+  @apply text-green-800 bg-green-100 border-green-200;
+}
+.dark .alert-success {
+  @apply text-green-300 border-green-700;
+  background-color: rgba(4, 120, 87, 0.2);
+}
+
+/* You can add global styles to this file, and also import other style files */
+@import "flatpickr/dist/flatpickr.min.css";
+/* @import "flatpickr/dist/themes/airbnb.css"; */ /* We will create a custom one */
+
+/* Custom Flatpickr theme inspired by Airbnb, with KRILI colors */
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme {
+  background-color: #ffffff; /* White background for the calendar */
+  border-radius: 12px; /* Rounded corners like Airbnb */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); /* Softer shadow */
+  border: 1px solid #e0e0e0; /* Light border */
+  padding: 8px; /* Some padding around */
+  font-family: 'Circular', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif; /* Airbnb-like font stack */
+}
+
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-months {
+  background-color: transparent; /* No specific background for month header */
+  padding: 12px 0;
+}
+
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-month {
+  color: var(--text-color-dark, #333); /* KRILI's dark text color */
+  fill: var(--text-color-dark, #333);
+  height: 48px; /* Taller month header */
+}
+
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-prev-month,
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-next-month {
+  top: 18px; /* Adjust vertical alignment of arrows */
+  padding: 6px;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-prev-month:hover,
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-next-month:hover {
+  background-color: #f0f0f0; /* Light grey hover for arrows */
+}
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-prev-month svg,
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-next-month svg {
+  width: 18px; /* Slightly larger arrows */
+  height: 18px;
+  fill: var(--primary, #007bff); /* KRILI primary color for arrows */
+}
+
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-current-month {
+    font-size: 1.25em; /* Larger month/year text */
+    font-weight: 600;
+    padding-top: 4px;
+}
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-current-month .flatpickr-monthDropdown-months {
+    font-weight: 600;
+}
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .numInputWrapper {
+    font-weight: 600;
+}
+
+
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-weekdays {
+  background-color: transparent;
+  padding-bottom: 8px;
+}
+
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-weekday {
+  color: var(--text-color-light, #777); /* Lighter text for weekday names */
+  font-weight: 500;
+  font-size: 0.8em;
+}
+
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-days {
+  padding: 0; /* Remove default padding if any */
+}
+
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day {
+  background: transparent;
+  border: 1px solid transparent; /* For hover/selection transitions */
+  color: var(--text-color-dark, #333);
+  font-weight: 500;
+  height: 40px; /* Taller day cells */
+  line-height: 40px; /* Vertically center number in cell */
+  margin: 1px; /* Small margin between days */
+  border-radius: 50%; /* Circular days */
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day:hover {
+  background-color: #f7f7f7; /* Very light grey hover */
+  border-color: #e0e0e0;
+}
+
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day.today {
+  border-color: var(--primary-light, #7fceff); /* KRILI primary light for today\'s date border */
+  color: var(--primary, #007bff);
+  font-weight: bold;
+}
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day.today:hover {
+  background-color: var(--primary-lighter, #e6f2ff); /* Lighter primary on hover for today */
+  color: var(--primary-dark, #0056b3);
+}
+
+
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day.selected,
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day.startRange,
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day.endRange,
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day.selected.inRange,
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day.startRange.inRange,
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day.endRange.inRange,
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day.selected:focus,
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day.startRange:focus,
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day.endRange:focus,
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day.selected:hover,
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day.startRange:hover,
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day.endRange:hover,
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day.selected.prevMonthDay,
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day.startRange.prevMonthDay,
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day.endRange.prevMonthDay,
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day.selected.nextMonthDay,
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day.startRange.nextMonthDay,
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day.endRange.nextMonthDay {
+  background: var(--primary, #007bff); /* KRILI primary color for selected dates */
+  color: #fff; /* White text for selected dates */
+  border-color: var(--primary-dark, #0056b3); /* Darker primary border for selected */
+  box-shadow: none; /* Remove default flatpickr shadow on selected */
+}
+
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day.inRange,
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day.prevMonthDay.inRange,
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day.nextMonthDay.inRange {
+  background: var(--primary-lighter, #e6f2ff); /* KRILI primary lighter for in-range dates */
+  color: var(--primary-dark, #0056b3); /* Darker primary text for in-range */
+  border-color: var(--primary-lighter, #e6f2ff);
+  border-radius: 0; /* Make in-range dates square-ish for range effect */
+  box-shadow: none;
+}
+/* Ensure start and end of range keep their circular shape */
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day.startRange,
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day.endRange {
+    border-radius: 50%;
+}
+
+
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day.disabled,
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day.disabled:hover,
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day.prevMonthDay.disabled,
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day.nextMonthDay.disabled {
+  background-color: #f0f0f0; /* Light grey for disabled dates */
+  color: #b0b0b0; /* Lighter text for disabled dates */
+  border-color: #f0f0f0;
+  cursor: not-allowed;
+  text-decoration: line-through; /* Strike-through for disabled dates */
+}
+
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day.prevMonthDay,
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day.nextMonthDay {
+  color: #ccc; /* Dim color for dates outside current month */
+}
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day.prevMonthDay:hover,
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-day.nextMonthDay:hover {
+  background-color: #f7f7f7;
+  color: #aaa;
+}
+
+/* Ensure inputs using flatpickr also look decent */
+input.flatpickr-input[readonly] {
+  background-color: #fff; /* Keep background white for readonly inputs */
+  cursor: pointer; /* Indicate it\'s clickable */
+}
+
+/* Style for the calendar icon often used with flatpickr inputs */
+.flatpickr-calendar-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--primary, #007bff);
+  cursor: pointer;
+}
+
+/* Ensure the calendar pops up nicely */
+.flatpickr-calendar.open {
+  z-index: 9999 !important; /* Higher z-index to ensure it's above all content including modals and fixed elements */
+  position: relative; /* Ensure proper stacking context */
+}
+
+/* Add some KRILI branding to the time picker if used (though not in this request) */
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-time {
+  border-top: 1px solid #e0e0e0;
+}
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-time input:hover,
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-time .flatpickr-am-pm:hover,
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-time input:focus,
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-time .flatpickr-am-pm:focus {
+    background: #f0f0f0;
+}
+div.flatpickr-calendar.krili-flatpickr-airbnb-theme .flatpickr-time .flatpickr-am-pm {
+    color: var(--primary, #007bff);
+}
+
+/* ... existing global styles ... */

@@ -1,0 +1,73 @@
+/* Styles for statistiques component */
+.period-btn {
+  background-color: white;
+  border-color: var(--border);
+  color: var(--text-light);
+  transition: all 0.2s;
+}
+
+.period-btn:hover:not(.active-period) {
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
+.period-btn:first-child {
+  border-top-left-radius: 0.375rem;
+  border-bottom-left-radius: 0.375rem;
+}
+
+.period-btn:last-child {
+  border-top-right-radius: 0.375rem;
+  border-bottom-right-radius: 0.375rem;
+}
+
+.period-btn.active-period {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: white;
+  font-weight: 500;
+}
+
+.stat-card {
+  transition: all 0.3s;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-icon i {
+  font-size: 1.5rem;
+}
+
+.chart-bars {
+  width: 100%;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+.chart-bar {
+  transition: all 0.3s;
+}
+
+.chart-bar:hover {
+  transform: translateY(-5px);
+}
+
+/* Animation du donut chart */
+@keyframes donut-fill {
+  0% { stroke-dasharray: 0 100; }
+}
+
+svg circle {
+  transform-origin: center;
+  transform: rotate(-90deg);
+  animation: donut-fill 1.5s ease-in-out forwards;
+}

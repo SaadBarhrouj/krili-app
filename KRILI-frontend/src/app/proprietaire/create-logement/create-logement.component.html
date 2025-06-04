@@ -1,0 +1,419 @@
+<!-- src/app/proprietaire/create-logement/create-logement.component.html -->
+<div style="background-color: var(--background);">
+    <div class="max-w-5xl mx-auto p-4 md:p-8">
+      <div class="mb-8 hidden md:block">
+        <h1 class="text-3xl font-bold mb-2" style="color: var(--text);">Publiez votre logement</h1>
+        <p class="text-lg" style="color: var(--text-light);">Partagez les détails de votre logement pour attirer des étudiants intéressés.</p>
+      </div>
+      <div class="md:hidden mb-4">
+        <h1 class="text-xl font-bold text-center" style="color: var(--text);">Publier un logement</h1>
+      </div>
+  
+      <!-- Progress Tracker - Desktop (INCHANGÉ) -->
+      <div class="hidden md:flex justify-between mb-12">
+         <div class="progress-step" [class.active]="currentStep === 1" [class.completed]="currentStep > 1">
+             <div class="progress-step-number">1</div>
+             <div class="progress-line right" [style.background-color]="currentStep > 1 ? 'var(--accent)' : 'var(--border)'"></div>
+             <span class="text-sm font-medium" [style.color]="currentStep === 1 ? 'var(--text)' : 'var(--text-light)'">Localisation & Infos</span>
+         </div>
+         <div class="progress-step" [class.active]="currentStep === 2" [class.completed]="currentStep > 2">
+             <div class="progress-line left" [style.background-color]="currentStep > 1 ? 'var(--accent)' : 'var(--border)'"></div>
+             <div class="progress-step-number">2</div>
+             <div class="progress-line right" [style.background-color]="currentStep > 2 ? 'var(--accent)' : 'var(--border)'"></div>
+             <span class="text-sm font-medium" [style.color]="currentStep === 2 ? 'var(--text)' : 'var(--text-light)'">Photos & Équipements</span>
+         </div>
+         <div class="progress-step" [class.active]="currentStep === 3" [class.completed]="currentStep > 3">
+             <div class="progress-line left" [style.background-color]="currentStep > 2 ? 'var(--accent)' : 'var(--border)'"></div>
+             <div class="progress-step-number">3</div>
+             <div class="progress-line right" [style.background-color]="currentStep > 3 ? 'var(--accent)' : 'var(--border)'"></div>
+             <span class="text-sm font-medium" [style.color]="currentStep === 3 ? 'var(--text)' : 'var(--text-light)'">Publication & Options</span>
+         </div>
+         <div class="progress-step" [class.active]="currentStep === 4 || currentStep === 5" [class.completed]="currentStep >= 4">
+            <div class="progress-line left" [style.background-color]="currentStep > 3 ? 'var(--accent)' : 'var(--border)'"></div>
+            <div class="progress-step-number">
+              <i *ngIf="currentStep === 5" class="fas fa-check"></i>
+              <span *ngIf="currentStep < 5">4</span>
+            </div>
+            <span class="text-sm font-medium" [style.color]="currentStep >= 4 ? 'var(--text)' : 'var(--text-light)'">Vérification</span>
+        </div>
+    </div>
+  
+      <!-- Progress Tracker - Mobile (INCHANGÉ) -->
+      <div class="md:hidden mb-6 flex items-center justify-between px-2">
+        <span class="text-sm font-medium" style="color: var(--accent);">Étape {{ currentStep }}/4</span>
+        <div class="w-2/3 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+          <div class="h-full rounded-full" [style.width.%]="(currentStep / 4) * 100" style="background-color: var(--accent);"></div>
+        </div>
+      </div>
+  
+      <form [formGroup]="createLogementForm" (ngSubmit)="onSubmit()">
+  
+        <!-- Étape 1: Localisation et Informations Générales -->
+        <div *ngIf="currentStep === 1" class="step-content card p-6 md:p-8">
+          <h2 class="text-xl md:text-2xl font-bold mb-6" style="color: var(--text);">Localisation et Informations Générales</h2>
+          <div class="space-y-6">
+            <!-- Adresse Ligne 1 -->
+            <div>
+              <label for="adresseLigne1" class="block text-sm font-medium mb-2" style="color: var(--text);">Adresse (N°, Rue, Résidence)*</label>
+              <input type="text" id="adresseLigne1" formControlName="adresseLigne1" class="form-input" placeholder="Ex: 15 Avenue Mohammed V, Immeuble Al Amal, Apt 3" required [class.is-invalid]="isInvalid('adresseLigne1')">
+              <div *ngIf="isInvalid('adresseLigne1')" class="invalid-feedback">
+                <div *ngIf="getError('adresseLigne1', 'required')">L'adresse est requise.</div>
+              </div>
+            </div>
+
+            <!-- Ville et Code Postal sur la même ligne pour desktop -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label for="villeId" class="block text-sm font-medium mb-2" style="color: var(--text);">Ville*</label>
+                <select id="villeId" formControlName="villeId" class="form-select" required [class.is-invalid]="isInvalid('villeId')" (change)="onVilleChange($event)">
+                  <option value="" disabled>Sélectionnez une ville</option>
+                  <option *ngFor="let ville of availableVilles" [value]="ville.id">{{ ville.nom }}</option>
+                </select>
+                <div *ngIf="isInvalid('villeId')" class="invalid-feedback">
+                  <div *ngIf="getError('villeId', 'required')">La ville est requise.</div>
+                </div>
+              </div>
+              <div>
+                <label for="codePostal" class="block text-sm font-medium mb-2" style="color: var(--text);">Code Postal*</label>
+                <input type="text" id="codePostal" formControlName="codePostal" class="form-input" placeholder="Ex: 20100" required [class.is-invalid]="isInvalid('codePostal')">
+                <div *ngIf="isInvalid('codePostal')" class="invalid-feedback">
+                  <div *ngIf="getError('codePostal', 'required')">Le code postal est requis.</div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Carte Leaflet déplacée ici -->
+            <div class="mb-6 mt-6"> <!-- Ajout de mt-6 pour un peu d\'espace au-dessus -->
+              <label class="block text-sm font-medium text-gray-700 mb-2">Localisation précise sur la carte (Cliquez pour placer/déplacer le marqueur)</label>
+              <div #mapContainer style="height: 400px; width: 100%; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"></div>
+              <div *ngIf="latitude?.value && longitude?.value" class="mt-2 text-sm text-gray-600 bg-gray-50 p-2 rounded-md">
+                <p>Latitude: <span class="font-medium">{{ latitude?.value | number:'1.6-6' }}</span></p>
+                <p>Longitude: <span class="font-medium">{{ longitude?.value | number:'1.6-6' }}</span></p>
+              </div>
+               <div *ngIf="!latitude?.value || !longitude?.value" class="mt-2 text-sm text-gray-500 italic">
+                Après avoir sélectionné une ville, cliquez sur la carte pour définir la localisation exacte.
+              </div>
+            </div>
+            <!-- Type de Logement et Nombre de Pièces -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label for="typeLogement" class="block text-sm font-medium mb-2" style="color: var(--text);">Type de logement*</label>
+                <select id="typeLogement" formControlName="typeLogement" class="form-select" required [class.is-invalid]="isInvalid('typeLogement')" (change)="onTypeLogementChange()">
+                  <option value="" disabled>Sélectionnez un type</option>
+                  <option *ngFor="let t of availableTypes" [value]="t.value">{{ t.label }}</option>
+                </select>
+                <div *ngIf="isInvalid('typeLogement')" class="invalid-feedback">
+                  <div *ngIf="getError('typeLogement', 'required')">Le type est requis.</div>
+                </div>
+              </div>
+              <div>
+                <label for="nombreDePieces" class="block text-sm font-medium mb-2" style="color: var(--text);">Nombre de Pièces Privatives*</label>
+                <input type="number" id="nombreDePieces" formControlName="nombreDePieces" class="form-input" placeholder="Ex: 1, 2..." min="1" required 
+                       [class.is-invalid]="isInvalid('nombreDePieces')"
+                       [readOnly]="isNombreDePiecesReadOnly()">
+                <div *ngIf="isInvalid('nombreDePieces')" class="invalid-feedback">
+                  <div *ngIf="getError('nombreDePieces', 'required')">Requis.</div>
+                  <div *ngIf="getError('nombreDePieces', 'min')">Min 1.</div>
+                </div>
+                <p class="text-xs mt-1" style="color: var(--text-light);">Pour Appartement: Salons + Chambres. Pour Studio/Chambre Coloc: 1 (auto).</p>
+              </div>
+            </div>
+
+            <!-- Surface et Prix (INCHANGÉ) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label for="surface" class="block text-sm font-medium mb-2" style="color: var(--text);">Surface (m²)*</label>
+                <input type="number" id="surface" formControlName="surface" class="form-input" placeholder="Ex: 25" min="1" required [class.is-invalid]="isInvalid('surface')">
+                <div *ngIf="isInvalid('surface')" class="invalid-feedback">
+                  <div *ngIf="getError('surface', 'required')">Requis.</div> <div *ngIf="getError('surface', 'min')">Min 1.</div>
+                </div>
+              </div>
+              <div>
+                <label for="prix" class="block text-sm font-medium mb-2" style="color: var(--text);">Loyer Mensuel (MAD)*</label>
+                <input type="number" id="prix" formControlName="prix" class="form-input" placeholder="Ex: 2500" min="1" required [class.is-invalid]="isInvalid('prix')">
+                <div *ngIf="isInvalid('prix')" class="invalid-feedback">
+                  <div *ngIf="getError('prix', 'required')">Requis.</div> <div *ngIf="getError('prix', 'min')">Min 1.</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Meublé (INCHANGÉ) -->
+            <div class="flex items-center">
+              <input type="checkbox" id="meuble" formControlName="meuble" class="form-checkbox">
+              <label for="meuble" class="ml-2 text-sm font-medium" style="color: var(--text);">Ce logement est meublé</label>
+            </div>
+
+            <!-- Description (INCHANGÉ) -->
+            <div>
+              <label for="description" class="block text-sm font-medium mb-2" style="color: var(--text);">Description détaillée*</label>
+              <textarea id="description" formControlName="description" rows="5" class="form-textarea" placeholder="Décrivez votre logement, ses atouts, le quartier. Si colocation, précisez les parties communes..." required [class.is-invalid]="isInvalid('description')"></textarea>
+              <div *ngIf="isInvalid('description')" class="invalid-feedback">
+                <div *ngIf="getError('description', 'required')">Requis.</div>
+                <div *ngIf="getError('description', 'minlength')">Minimum {{ description?.errors?.['minlength']?.requiredLength }} car.</div>
+              </div>
+              <p class="text-xs mt-1" style="color: var(--text-light);">Minimum 50 caractères.</p>
+            </div>
+
+            <!-- Carte Leaflet déplacée ici -->
+            <!-- CE BLOC EST MAINTENANT SUPPRIMÉ DE CETTE POSITION ET DÉPLACÉ PLUS HAUT -->
+          </div>
+          <div class="step-buttons">
+            <a routerLink="/proprietaire/dashboard" class="btn-secondary"><i class="fas fa-arrow-left mr-2"></i> Annuler</a>
+            <button type="button" class="btn-accent" (click)="nextStep()">Continuer <i class="fas fa-arrow-right ml-2"></i></button>
+          </div>
+        </div>
+  
+        <!-- Étape 2: Photos, Équipements et Proximité Établissements -->
+        <div *ngIf="currentStep === 2" class="step-content card p-6 md:p-8">
+          <h2 class="text-xl md:text-2xl font-bold mb-6" style="color: var(--text);">Photos, Équipements & Proximité</h2>
+          <div class="space-y-8">
+            <!-- Section Photos (INCHANGÉ) -->
+            <div>
+              <label class="block text-sm font-medium mb-4" style="color: var(--text);">Photos du logement ({{ imagePreviews.length }} / {{ maxImages }})</label>
+              <p class="text-sm mb-4" style="color: var(--text-light);">Ajoutez au moins 1 photo. La première sera mise en avant.</p>
+              <div *ngIf="isInvalid('images') && imagePreviews.length === 0" class="alert alert-danger mb-4">{{ getCustomFormError('images-required') }}</div>
+              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                <div *ngFor="let preview of imagePreviews; let i = index" class="photo-preview-container">
+                  <div class="photo-preview">
+                    <img [src]="preview.url" [alt]="'Aperçu ' + (i + 1)">
+                    <div class="remove-photo" (click)="removeFile(i)" title="Supprimer"><i class="fas fa-times"></i></div>
+                  </div>
+                </div>
+                <div *ngIf="imagePreviews.length < maxImages">
+                  <div class="photo-upload-container" (click)="additionalPhotoInput.click()">
+                    <i class="fas fa-plus text-3xl mb-3" style="color: var(--text-light);"></i>
+                    <p class="text-sm font-medium" style="color: var(--text);">Ajouter</p>
+                    <p class="text-xs mt-1" style="color: var(--text-light);">{{ maxImages - imagePreviews.length }} restant(es)</p>
+                    <input #additionalPhotoInput type="file" class="hidden" accept="image/*" multiple (change)="onFileSelected($event)">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Section Équipements (INCHANGÉ) -->
+            <div>
+              <label class="block text-sm font-medium mb-4" style="color: var(--text);">Équipements disponibles</label>
+              <div *ngIf="equipmentCategories.essentiels.length > 0" class="mb-4">
+                <p class="text-sm font-medium mb-2" style="color: var(--text);">Essentiels</p>
+                <div class="flex flex-wrap gap-2">
+                  <span *ngFor="let eq of equipmentCategories.essentiels" class="equipment-tag" [class.selected]="isEquipmentSelected(eq.key)" (click)="toggleEquipment(eq.key)">
+                    <i [ngClass]="getEquipmentIcon(eq.key)" class="mr-2 w-4 text-center"></i>{{ eq.key }}
+                  </span>
+                </div>
+              </div>
+              <div *ngIf="equipmentCategories.espaces.length > 0" class="mb-4">
+                <p class="text-sm font-medium mb-2" style="color: var(--text);">Espaces</p>
+                <div class="flex flex-wrap gap-2">
+                  <span *ngFor="let eq of equipmentCategories.espaces" class="equipment-tag" [class.selected]="isEquipmentSelected(eq.key)" (click)="toggleEquipment(eq.key)">
+                     <i [ngClass]="getEquipmentIcon(eq.key)" class="mr-2 w-4 text-center"></i>{{ eq.key }}
+                  </span>
+                </div>
+              </div>
+              <div *ngIf="equipmentCategories.autres.length > 0">
+                <p class="text-sm font-medium mb-2" style="color: var(--text);">Autres</p>
+                <div class="flex flex-wrap gap-2">
+                  <span *ngFor="let eq of equipmentCategories.autres" class="equipment-tag" [class.selected]="isEquipmentSelected(eq.key)" (click)="toggleEquipment(eq.key)">
+                     <i [ngClass]="getEquipmentIcon(eq.key)" class="mr-2 w-4 text-center"></i>{{ eq.key }}
+                  </span>
+                </div>
+              </div>
+              <div formArrayName="equipements" class="hidden"></div>
+            </div>
+
+            <!-- NOUVELLE Section Établissements Proches -->
+            <div>
+              <label for="etablissementIds" class="block text-sm font-medium mb-2" style="color: var(--text);">Établissements d'enseignement proches (Optionnel)</label>
+              <p class="text-xs mb-3" style="color: var(--text-light);">Sélectionnez les campus, universités ou écoles importantes à proximité. La liste s'adapte à la ville choisie à l'étape 1.</p>
+              <div *ngIf="!createLogementForm.get('villeId')?.value" class="text-sm p-3 rounded-md" style="background-color: var(--background-alt); color: var(--text-light);">
+                Veuillez d'abord sélectionner une ville à l'étape 1 pour voir les établissements.
+              </div>
+              <div *ngIf="createLogementForm.get('villeId')?.value && isLoadingEtablissements" class="text-sm p-3 flex items-center" style="color: var(--text-light);">
+                <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                Chargement des établissements...
+              </div>
+              <div *ngIf="createLogementForm.get('villeId')?.value && !isLoadingEtablissements && availableEtablissements.length === 0" class="text-sm p-3 rounded-md" style="background-color: var(--background-alt); color: var(--text-light);">
+                Aucun établissement enregistré pour cette ville. Vous pouvez passer cette étape.
+              </div>
+              <div *ngIf="createLogementForm.get('villeId')?.value && !isLoadingEtablissements && availableEtablissements.length > 0" 
+                   class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-60 overflow-y-auto p-1 border rounded-md" style="border-color: var(--border);">
+                <div *ngFor="let etab of availableEtablissements" class="flex items-center p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                  <input type="checkbox" [id]="'etab-' + etab.id" [value]="etab.id" 
+                         (change)="onEtablissementChange($event)" 
+                         [checked]="isEtablissementSelected(etab.id)"
+                         class="h-4 w-4 text-accent focus:ring-accent border-gray-300 rounded">
+                  <label [for]="'etab-' + etab.id" class="ml-2 text-sm" style="color: var(--text);">{{ etab.nom }}</label>
+                </div>
+              </div>
+              <div formArrayName="etablissementIds" class="hidden"></div>
+            </div>
+
+          </div>
+          <div class="step-buttons">
+            <button type="button" class="btn-secondary" (click)="previousStep()"><i class="fas fa-arrow-left mr-2"></i> Retour</button>
+            <button type="button" class="btn-accent" (click)="nextStep()">Continuer <i class="fas fa-arrow-right ml-2"></i></button>
+          </div>
+        </div>
+  
+        <!-- Étape 3: Options de Publication -->
+        <div *ngIf="currentStep === 3" class="step-content card p-6 md:p-8">
+          <h2 class="text-xl md:text-2xl font-bold mb-6" style="color: var(--text);">Disponibilité et Options de Publication</h2>
+          <div class="space-y-8">
+            <!-- Disponibilité (INCHANGÉ) -->
+            <div>
+              <label class="block text-sm font-medium mb-4" style="color: var(--text);">Disponibilité</label>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label for="dateDisponibilite" class="block text-sm font-medium mb-2" style="color: var(--text);">Disponible à partir du*</label>
+                  <input type="date" id="dateDisponibilite" formControlName="dateDisponibilite" class="form-input" required [class.is-invalid]="isInvalid('dateDisponibilite')">
+                  <div *ngIf="isInvalid('dateDisponibilite')" class="invalid-feedback">
+                    <div *ngIf="getError('dateDisponibilite', 'required')">Requis.</div>
+                  </div>
+                </div>
+                <div>
+                  <label for="statut" class="block text-sm font-medium mb-2" style="color: var(--text);">Visibilité de l'Annonce*</label>
+                  <select id="statut" formControlName="statut" class="form-select">
+                    <option *ngFor="let s of availableStatus" [value]="s.value">{{ s.label }}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <!-- Options Premium (INCHANGÉ) -->
+            <div>
+              <label class="block text-sm font-medium mb-4" style="color: var(--text);">Boostez votre annonce (Optionnel)</label>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div *ngFor="let option of availablePremium" class="premium-option" [class.selected]="niveauPremium?.value === option.value" (click)="selectPremiumOption(option.value)">
+                  <div class="flex justify-between items-start mb-3">
+                    <h3 class="font-bold" style="color: var(--text);">{{ option.label }}</h3>
+                    <div class="font-bold" [style.color]="option.value === 'STANDARD' ? 'var(--text)' : 'var(--accent)'">{{ option.prix }}</div>
+                  </div>
+                  <ul class="text-sm space-y-2 mb-4 flex-grow" style="color: var(--text-light);">
+                    <li *ngFor="let feature of option.features"><i class="fas fa-check-circle text-green-500 mr-2"></i>{{ feature }}</li>
+                    <li><i class="fas fa-check-circle text-green-500 mr-2"></i>{{ option.photos }} photos max</li>
+                  </ul>
+                  <div class="text-center mt-auto">
+                    <span class="inline-block w-4 h-4 rounded-full border-2 premium-radio" [class.selected]="niveauPremium?.value === option.value"></span>
+                  </div>
+                </div>
+              </div>
+              <input type="hidden" formControlName="niveauPremium">
+            </div>
+          </div>
+          <!-- Boutons Étape 3 avec logique de paiement simulé -->
+          <div class="step-buttons">
+            <button type="button" class="btn-secondary" (click)="previousStep()"><i class="fas fa-arrow-left mr-2"></i> Retour</button>
+            
+            <ng-container *ngIf="niveauPremium?.value === 'STANDARD'; else premiumPaymentButton">
+              <button type="button" class="btn-accent" (click)="nextStep()">
+                Vérifier l'annonce <i class="fas fa-arrow-right ml-2"></i>
+              </button>
+            </ng-container>
+            <ng-template #premiumPaymentButton>
+              <button type="button" class="btn-accent" (click)="simulatePaymentAndContinue()" [disabled]="isLoading">
+                <span *ngIf="!isLoading">Payer {{ selectedPremiumOptionPrice }} (Simulé) & Vérifier <i class="fas fa-arrow-right ml-2"></i></span>
+                <span *ngIf="isLoading" class="flex items-center justify-center">
+                  <svg class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                  Simulation...
+                </span>
+              </button>
+            </ng-template>
+          </div>
+        </div>
+  
+        <!-- Étape 4: Vérification et Soumission (AccepteTerms déplacé ici si pas à l'inscription) -->
+        <div *ngIf="currentStep === 4" class="step-content card p-6 md:p-8">
+          <h2 class="text-xl md:text-2xl font-bold mb-6" style="color: var(--text);">Vérifier et Publier</h2>
+          <div class="space-y-8">
+            <!-- Aperçu (ADAPTÉ) -->
+            <div class="border-b pb-6" style="border-color: var(--border);">
+              <h3 class="text-lg font-semibold mb-4" style="color: var(--text);">Aperçu de l'annonce</h3>
+              <div class="flex flex-col md:flex-row">
+                <div class="w-full md:w-1/3 mb-4 md:mb-0 md:mr-6">
+                  <div class="bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden h-48 flex items-center justify-center">
+                    <img *ngIf="imagePreviews.length > 0" [src]="imagePreviews[0].url" class="w-full h-full object-cover" alt="Aperçu principal">
+                    <span *ngIf="imagePreviews.length === 0" class="text-sm" style="color: var(--text-light);">Aucune photo</span>
+                  </div>
+                </div>
+                <div class="w-full md:w-2/3">
+                  <h4 class="text-xl font-bold mb-1" style="color: var(--text);">
+                    {{ typeLogement?.value | typeLogementLabel }} - {{ (adresseLigne1?.value || 'Adresse').split(',')[0] }}
+                  </h4>
+                  <p class="text-sm mb-1" style="color: var(--text-light);">{{ adresseLigne1?.value }}, {{ codePostal?.value }} {{ getVilleNameById(villeId?.value) }}</p>
+                  <div class="flex flex-wrap mb-3 gap-2">
+                    <span class="tag-summary">{{ typeLogement?.value | typeLogementLabel }}</span>
+                    <span class="tag-summary">{{ surface?.value || 'N/A' }} m²</span>
+                    <span class="tag-summary">{{ nombreDePieces?.value }} pièce(s)</span>
+                    <span class="tag-summary">{{ meuble?.value ? 'Meublé' : 'Non meublé' }}</span>
+                  </div>
+                  <div class="mb-3"><span class="font-bold text-lg" style="color: var(--text);">{{ prix?.value || 0 }} MAD</span> <span class="text-sm" style="color: var(--text-light);">/mois</span></div>
+                  <p class="text-sm line-clamp-3" style="color: var(--text);">{{ description?.value || 'Aucune description' }}</p>
+                </div>
+              </div>
+            </div>
+            <!-- Récapitulatif (ADAPTÉ) -->
+            <div class="border-b pb-6" style="border-color: var(--border);">
+               <h3 class="text-lg font-semibold mb-4" style="color: var(--text);">Récapitulatif Détaillé</h3>
+               <div class="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-6 text-sm">
+                   <div><strong class="font-medium" style="color: var(--text-light);">Adresse:</strong> <span style="color: var(--text);">{{ adresseLigne1?.value }}</span></div>
+                   <div><strong class="font-medium" style="color: var(--text-light);">Ville:</strong> <span style="color: var(--text);">{{ getVilleNameById(villeId?.value) || 'N/A' }} ({{ codePostal?.value || 'N/A' }})</span></div>
+                   <div><strong class="font-medium" style="color: var(--text-light);">Type:</strong> <span style="color: var(--text);">{{ typeLogement?.value | typeLogementLabel }}</span></div>
+                   <div><strong class="font-medium" style="color: var(--text-light);">Pièces Privatives:</strong> <span style="color: var(--text);">{{ nombreDePieces?.value }}</span></div>
+                   <div><strong class="font-medium" style="color: var(--text-light);">Surface:</strong> <span style="color: var(--text);">{{ surface?.value }} m²</span></div>
+                   <div><strong class="font-medium" style="color: var(--text-light);">Loyer:</strong> <span style="color: var(--text);">{{ prix?.value }} MAD/mois</span></div>
+                   <div><strong class="font-medium" style="color: var(--text-light);">Meublé:</strong> <span style="color: var(--text);">{{ meuble?.value ? 'Oui' : 'Non' }}</span></div>
+                   <div><strong class="font-medium" style="color: var(--text-light);">Disponible le:</strong> <span style="color: var(--text);">{{ dateDisponibilite?.value | date:'dd/MM/yyyy' }}</span></div>
+                   <div class="md:col-span-2"><strong class="font-medium" style="color: var(--text-light);">Équipements:</strong> <span style="color: var(--text);">{{ equipmentsSummary }}</span></div>
+                   <div class="md:col-span-2" *ngIf="selectedEtablissementsSummary.length > 0">
+                       <strong class="font-medium" style="color: var(--text-light);">Établissements Proches:</strong> 
+                       <span style="color: var(--text);">{{ selectedEtablissementsSummary }}</span>
+                   </div>
+                   <div><strong class="font-medium" style="color: var(--text-light);">Visibilité:</strong> <span style="color: var(--text);">{{ statut?.value === 'ACTIVE' ? 'Publiée' : 'Brouillon' }}</span></div>
+                   <div>
+                      <strong class="font-medium" style="color: var(--text-light);">Option Boost:</strong> 
+                      <span style="color: var(--text);">{{ selectedPremiumOptionLabel }} ({{ selectedPremiumOptionPrice }})</span>
+                   </div>
+               </div>
+            </div>
+            <!-- Conditions (si vous les gardez ici, sinon déjà acceptées à l'inscription proprio) -->
+            <!-- 
+            <div>
+              <div class="flex items-center mb-6">
+                <input type="checkbox" id="accepteTermsPublication" formControlName="accepteTerms" class="form-checkbox" required [class.is-invalid]="isInvalid('accepteTerms')">
+                <label for="accepteTermsPublication" class="ml-2 text-sm" style="color: var(--text);">Je certifie que les informations sont exactes et j'accepte les <a routerLink="/conditions-publication" target="_blank" class="terms-link">conditions de publication</a>.</label>
+              </div>
+              <div *ngIf="isInvalid('accepteTerms')" class="invalid-feedback ml-7" style="display: block;">
+                Vous devez accepter les conditions.
+              </div>
+            </div>
+            -->
+            <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+          </div>
+          <div class="step-buttons">
+            <button type="button" class="btn-secondary" (click)="previousStep()"><i class="fas fa-arrow-left mr-2"></i> Retour</button>
+            <button type="submit" class="btn-accent" [disabled]="isLoading">
+              <span *ngIf="!isLoading"><i class="fas fa-check mr-2"></i> {{ statut?.value === 'ACTIVE' ? 'Publier l\'annonce' : 'Enregistrer le Brouillon' }}</span>
+              <span *ngIf="isLoading" class="flex items-center justify-center">
+                <svg class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                Enregistrement...
+              </span>
+            </button>
+          </div>
+        </div>
+  
+        <!-- Étape 5: Message de Succès (INCHANGÉ) -->
+        <div *ngIf="currentStep === 5" class="step-content text-center py-12">
+             <div class="mb-6 flex justify-center">
+                 <div class="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                     <i class="fas fa-check text-2xl" style="color: var(--secondary);"></i>
+                 </div>
+             </div>
+             <h2 class="text-2xl font-bold mb-2" style="color: var(--text);">{{ successMessage || 'Annonce Enregistrée !' }}</h2>
+             <p class="text-lg mb-8" style="color: var(--text-light);" *ngIf="formLastStatus === 'ACTIVE'">Votre annonce sera visible publiquement après une vérification rapide.</p>
+             <p class="text-lg mb-8" style="color: var(--text-light);" *ngIf="formLastStatus === 'BROUILLON'">Votre annonce a été sauvegardée comme brouillon. Vous pourrez la publier plus tard.</p>
+             <div class="flex flex-col md:flex-row justify-center space-y-4 md:space-y-0 md:space-x-4">
+                 <a routerLink="/proprietaire/logements" class="btn-accent"><i class="fas fa-list-alt mr-2"></i> Voir Mes Annonces</a>
+                 <button type="button" (click)="resetFormAndGoToStep1()" class="btn-secondary"><i class="fas fa-plus mr-2"></i> Créer une Autre Annonce</button>
+             </div>
+         </div>
+      </form>
+    </div>
+  </div>

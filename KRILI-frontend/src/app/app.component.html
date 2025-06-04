@@ -1,0 +1,17 @@
+<!-- src/app/app.component.html -->
+<ng-container *ngIf="showMainHeaderAndFooter$ | async">
+  <app-header
+    [currentUser]="currentUserForHeader"
+    [unreadNotificationCount]="unreadNotificationCountForHeader"
+    (logoutClicked)="logout()">
+    <!-- L'attribut [isProprietaire] a été retiré de app-header car il est maintenant géré par le contexte d'affichage de ce header -->
+  </app-header>
+</ng-container>
+
+<main class="main-content-area flex-grow"> <!-- `flex-grow` est utile si le parent est flex et que vous voulez que le main prenne la place dispo -->
+  <router-outlet></router-outlet>
+</main>
+
+<ng-container *ngIf="showMainHeaderAndFooter$ | async">
+  <app-footer [currentYear]="currentYear"></app-footer>
+</ng-container>

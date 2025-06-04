@@ -1,0 +1,49 @@
+<!-- src/app/layout/footer/footer.component.html -->
+<footer class="mt-16 py-8 border-t" style="border-color: var(--border); background-color: var(--background-alt);">
+  <div class="max-w-6xl mx-auto px-4 md:px-6">
+    <div class="flex flex-col md:flex-row justify-between">
+      <!-- Colonne Logo -->
+      <div class="mb-6 md:mb-0">
+        <div class="flex items-center">
+          <svg class="h-8 w-8" style="color: var(--primary);" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 9L12 4L21 9L12 14L3 9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M5 11V17L12 21L19 17V11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <h2 class="text-xl font-bold ml-2" style="color: var(--primary);">KRILI</h2>
+        </div>
+        <p class="mt-2 text-sm" style="color: var(--text-light);">Le logement étudiant simplifié</p>
+      </div>
+      <!-- Colonnes Liens -->
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-8">
+        <div>
+          <h3 class="text-sm font-semibold mb-3" style="color: var(--text);">À propos</h3>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#" style="color: var(--text-light);" class="hover:text-primary">Comment ça marche</a></li>
+            <li><a href="#" style="color: var(--text-light);" class="hover:text-primary">Notre équipe</a></li>
+            <li><a href="#" style="color: var(--text-light);" class="hover:text-primary">Partenaires</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold mb-3" style="color: var(--text);">Support</h3>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#" style="color: var(--text-light);" class="hover:text-primary">FAQ</a></li>
+            <li><a href="#" style="color: var(--text-light);" class="hover:text-primary">Contact</a></li>
+            <li><a href="#" style="color: var(--text-light);" class="hover:text-primary">Assistance</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold mb-3" style="color: var(--text);">Légal</h3>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#" style="color: var(--text-light);" class="hover:text-primary">Conditions d'utilisation</a></li>
+            <li><a href="#" style="color: var(--text-light);" class="hover:text-primary">Politique de confidentialité</a></li>
+            <li><a href="#" style="color: var(--text-light);" class="hover:text-primary">Cookies</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <!-- Copyright -->
+    <div class="mt-8 pt-6 border-t text-center" style="border-color: var(--border);">
+      <p class="text-sm" style="color: var(--text-light);">© {{ currentYear }} KRILI. Tous droits réservés.</p>
+    </div>
+  </div>
+</footer>

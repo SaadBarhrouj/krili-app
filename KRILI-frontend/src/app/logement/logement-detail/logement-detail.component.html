@@ -1,0 +1,448 @@
+<!-- src/app/logement/logement-detail/logement-detail.component.html -->
+<div class="detail-container">
+
+    <!-- Chargement -->
+    <div *ngIf="isLoading" class="loading-overlay">
+      <svg class="animate-spin h-12 w-12" style="color: var(--primary);" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <p>Chargement des détails...</p>
+    </div>
+
+    <!-- Erreur -->
+    <div *ngIf="!isLoading && errorMessage" class="error-message">
+      <i class="fas fa-exclamation-triangle icon"></i>
+      <span>{{ errorMessage }}</span>
+      <a routerLink="/annonces" class="btn btn-secondary mt-4">Retour aux annonces</a>
+    </div>
+
+    <!-- Contenu Principal -->
+    <div *ngIf="!isLoading && logement" class="logement-content-wrapper">
+      
+      <!-- Header de l'annonce - Titre et actions -->
+      <div class="logement-header">
+        <div class="logement-title-container">
+          <!-- Titre avec badge premium intégré -->
+          <h1 class="logement-title">
+            {{ logement.type || 'Logement' }}
+            <span *ngIf="logement.niveauPremium && logement.niveauPremium !== 'STANDARD'" class="detail-badge badge-style-premium ml-2">
+              <i class="fas fa-crown"></i> {{ logement.niveauPremium }}
+            </span>
+          </h1>
+          <!-- Adresse affichée une seule fois -->
+          <p class="logement-address">
+            <i class="fas fa-map-marker-alt"></i>
+            {{ logement.adresseLigne1 || 'Adresse non précisée' }}
+          </p>
+
+          <!-- Review Stats -->
+          <div class="review-stats-inline" *ngIf="logement.reviewCount && logement.reviewCount > 0; else noReviewsYetHeader">
+            <span class="stars">
+              <i class="fas fa-star" *ngFor="let i of [].constructor(Math.floor(logement.avgRating || 0))"></i>
+              <i class="fas fa-star-half-alt" *ngIf="(logement.avgRating || 0) % 1 !== 0"></i>
+              <i class="far fa-star" *ngFor="let i of [].constructor(5 - Math.ceil(logement.avgRating || 0))"></i>
+            </span>
+            <span class="rating-value">{{ logement.avgRating | number:'1.1-1' }}</span>
+            <span class="review-count">({{ logement.reviewCount }} avis)</span>
+          </div>
+          <ng-template #noReviewsYetHeader>
+            <p class="text-sm text-gray-500">Aucun avis pour le moment.</p>
+          </ng-template>
+          
+          <!-- Badges Dynamiques -->
+          <div class="badges-container" *ngIf="logement.displayBadges && logement.displayBadges.length > 0">            <span *ngFor="let badgeKey of logement.displayBadges"
+                  class="detail-badge"
+                  [ngClass]="getBadgeSpecificClass(badgeKey)">
+              <i [ngClass]="getBadgeIcon(badgeKey)" class="mr-1"></i> {{ getBadgeText(badgeKey) }}
+            </span>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button *ngIf="isCurrentUserEtudiant" (click)="toggleFavorite()" class="action-btn" [title]="isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'" [disabled]="isFavoriteLoading || isCheckingFavoriteStatus">
+            <i class="fa-heart" [ngClass]="{'fas text-red-500': isFavorite, 'far': !isFavorite, 'opacity-50': isCheckingFavoriteStatus}"></i>
+            <svg *ngIf="isFavoriteLoading" class="animate-spin h-5 w-5 text-gray-600 absolute inset-0 m-auto" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+          </button>
+          <button class="action-btn" title="Partager" (click)="shareLogement()"><i class="fas fa-share-alt"></i></button>
+        </div>
+      </div>
+        <!-- Galerie Photos améliorée - Style Airbnb -->
+      <div class="photo-gallery" *ngIf="logement.photos && logement.photos.length > 0">
+        <div class="main-photo-container">
+          <img [src]="getImageUrl(logement.photos[selectedImageIndex])" [alt]="'Photo principale du logement'" class="main-photo">
+          <button *ngIf="logement.photos.length > 1" (click)="prevImage()" class="gallery-nav prev" aria-label="Image précédente"><i class="fas fa-chevron-left"></i></button>
+          <button *ngIf="logement.photos.length > 1" (click)="nextImage()" class="gallery-nav next" aria-label="Image suivante"><i class="fas fa-chevron-right"></i></button>
+          
+          <!-- Compteur de photos -->
+          <div *ngIf="logement.photos.length > 1" class="photo-counter">
+            {{ selectedImageIndex + 1 }}/{{ logement.photos.length }}
+          </div>
+        </div>
+        
+        <!-- Miniatures sur le côté en version desktop - limité à 3 maximum -->
+        <div class="thumbnails-grid" *ngIf="logement.photos.length > 1">
+          <!-- Limiter à 3 miniatures maximum pour éviter le débordement -->
+          <div *ngFor="let photo of logement.photos.slice(0, 3); let i = index" 
+              class="thumbnail-container" 
+              [class.active]="i === selectedImageIndex">
+            <img [src]="getImageUrl(photo)" [alt]="'Miniature ' + (i + 1)" 
+                class="thumbnail" 
+                [class.active]="i === selectedImageIndex" 
+                (click)="selectImage(i)">
+          </div>
+        </div>
+      </div>
+      
+      <!-- Placeholder si pas de photos -->
+      <div *ngIf="!logement.photos || logement.photos.length === 0" class="photo-placeholder">
+        <i class="fas fa-image fa-2x"></i>
+        <p>Aucune photo disponible pour ce logement</p>
+      </div>
+
+      <!-- Grille Contenu Principal -->
+      <div class="main-content-grid">
+        <div class="details-column">          <!-- Section Infos Clés -->
+          <div class="info-section card">
+            <h2 class="section-title">
+              <i class="fas fa-info-circle"></i> Informations Clés
+            </h2>            <div class="key-info-grid">
+              <div>
+                <div class="info-label">
+                  <i class="fas fa-tag"></i>
+                  <strong>Type</strong>
+                </div>
+                <div class="info-value">{{ logement.type || 'Non précisé' }}</div>
+              </div>
+              
+              <div>
+                <div class="info-label">
+                  <i class="fas fa-ruler-combined"></i>
+                  <strong>Surface</strong>
+                </div>
+                <div class="info-value numeric" *ngIf="logement.surface">{{ logement.surface }} m²</div>
+                <div class="info-value not-available" *ngIf="!logement.surface">Non précisée</div>
+              </div>
+              
+              <div>
+                <div class="info-label">
+                  <i class="fas fa-door-open"></i>
+                  <strong>Pièces</strong>
+                </div>
+                <div class="info-value numeric" *ngIf="logement.nombreDePieces">{{ logement.nombreDePieces }}</div>
+                <div class="info-value not-available" *ngIf="!logement.nombreDePieces">Non précisé</div>
+              </div>
+              
+              <div>
+                <div class="info-label">
+                  <i class="fas fa-couch"></i>
+                  <strong>Meublé</strong>
+                </div>
+                <div class="info-value">{{ logement.meuble ? 'Oui' : 'Non' }}</div>
+              </div>
+              
+              <div>
+                <div class="info-label">
+                  <i class="fas fa-calendar-alt"></i>
+                  <strong>Disponibilité</strong>
+                </div>
+                <div class="info-value numeric" *ngIf="logement.dateDisponibilite">{{ logement.dateDisponibilite | date:'dd/MM/yyyy' }}</div>
+                <div class="info-value not-available" *ngIf="!logement.dateDisponibilite">Non précisée</div>
+              </div>
+              
+              <div>
+                <div class="info-label">
+                  <i class="fas fa-check-circle"></i>
+                  <strong>Statut</strong>
+                </div>
+                <div class="info-value">{{ getStatutLibelle(logement.statut) }}</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Section Description -->
+          <div class="info-section card">
+            <h2 class="section-title">
+              <i class="fas fa-align-left"></i> Description
+            </h2>
+            <p class="description-text" *ngIf="logement.description">{{ logement.description }}</p>
+            <p class="description-text not-available" *ngIf="!logement.description">
+              Le propriétaire n'a pas fourni de description détaillée pour ce logement.
+            </p>
+          </div>
+
+          <!-- Section Équipements -->
+          <div class="info-section card">
+            <h2 class="section-title">
+              <i class="fas fa-list-ul"></i> Équipements Inclus
+            </h2>
+            <ul class="equipment-list" *ngIf="logement.equipements && logement.equipements.length > 0">
+              <li *ngFor="let equip of logement.equipements"><i [ngClass]="getEquipmentIcon(equip)" class="equipment-icon"></i> {{ equip }}</li>
+            </ul>
+            <p class="not-available equipment-empty" *ngIf="!logement.equipements || logement.equipements.length === 0">
+              Aucun équipement spécifique n'a été listé pour ce logement.
+            </p>
+          </div>
+          
+          <!-- Section Localisation -->
+          <div class="info-section card">
+            <h2 class="section-title">
+              <i class="fas fa-map-marked-alt"></i> Localisation
+            </h2>
+            <div *ngIf="logement && logement.latitude && logement.longitude; else noLocationData">
+              <div #mapDetailContainer style="height: 300px; width: 100%; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-top: 1rem;"></div>
+            </div>
+            <ng-template #noLocationData>
+              <div class="map-placeholder">
+                <i class="fas fa-map-marked-alt"></i>
+                <p>Localisation non précisée par le propriétaire.</p>
+                <small *ngIf="logement?.adresseLigne1">{{ logement.adresseLigne1 }}</small>
+              </div>
+            </ng-template>
+          </div>
+        </div> <!-- Fin Colonne Gauche -->
+
+        <!-- Colonne Droite: Sidebar -->
+        <div class="sidebar-column">
+          <!-- Carte de prix et réservation -->
+          <div class="booking-card card">
+            <div class="price-display">
+              <span class="price" *ngIf="logement.prix">{{ logement.prix | currency:'MAD':'symbol':'1.0-0' }}</span>
+              <span class="price not-available" *ngIf="!logement.prix">Prix non défini</span>
+              <span class="period" *ngIf="logement.prix">/ mois</span>
+            </div>
+            <p class="charges-info" *ngIf="logement.prix">Charges potentiellement incluses</p>
+            <!-- NOUVEAU : Bouton "Faire une demande" conditionnel -->
+            <button *ngIf="isCurrentUserEtudiant && logement.statut === 'ACTIVE' && !demandeDejaEnvoyee"
+                    class="btn btn-accent btn-book" 
+                    (click)="toggleDemandeForm()">
+              <i class="fas fa-calendar-plus mr-2"></i> Faire une demande de réservation
+            </button>
+            <div *ngIf="demandeDejaEnvoyee" class="text-center p-3 bg-green-100 text-green-700 rounded-md text-sm">
+              <i class="fas fa-check-circle mr-1"></i> Votre demande est en cours de traitement.
+            </div>
+            <button *ngIf="!isCurrentUserEtudiant && logement.statut === 'ACTIVE'"
+                    [routerLink]="['/login']" [queryParams]="{ returnUrl: routerInstance.url }"
+                    class="btn btn-primary btn-book">
+              <i class="fas fa-sign-in-alt mr-2"></i> Connectez-vous pour réserver
+            </button>
+            <button *ngIf="logement.statut !== 'ACTIVE'" class="btn btn-accent btn-book" disabled>
+              {{ getStatutLibelle(logement.statut) }}
+            </button>
+          </div>
+          
+          <!-- Carte du propriétaire -->
+          <div class="owner-card card" *ngIf="logement.proprietaireId && logement.proprietaireNom">
+            <h3 class="owner-title">Proposé par</h3>
+            <div class="owner-info">
+              <img [src]="logement.proprietaireAvatarId ? getImageUrl(logement.proprietaireAvatarId) : 'https://ui-avatars.com/api/?name=' + (logement.proprietaireNom || 'P').charAt(0) + '&background=EBF4FF&color=1D4ED8&bold=true'" 
+                   alt="Photo du propriétaire" class="owner-avatar">
+              <div>
+                <a [routerLink]="['/proprietaires', logement.proprietaireId]" class="owner-name-link">{{ logement.proprietaireNom }}</a>
+                <p class="owner-status"><i class="fas fa-check-circle"></i>Propriétaire vérifié</p>
+              </div>
+            </div>
+            <a [routerLink]="['/proprietaires', logement.proprietaireId]" class="btn btn-secondary btn-view-profile">Voir le profil</a>
+            <button class="btn btn-outline btn-contact-owner" disabled><i class="fas fa-comment-alt mr-2"></i>Contacter (Bientôt)</button>
+          </div>
+
+          <!-- NOUVEAU : Formulaire de demande de réservation (Modal ou Section) -->
+          <div *ngIf="showDemandeForm" class="demande-form-modal card mt-4">
+            <form [formGroup]="demandeForm" (ngSubmit)="onSubmitDemande()">
+              <h4 class="text-lg font-semibold mb-3">Votre demande pour "{{ logement.type }}"</h4>              <div class="form-group">
+                <label for="dateDebut" class="form-label">Date de début souhaitée*</label>
+                <div class="flatpickr-input-wrapper">
+                  <input type="text" id="dateDebut" formControlName="dateDebut" class="form-control flatpickr-input" placeholder="Sélectionnez la date de début" readonly>
+                  <div class="flatpickr-calendar-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                  </div>
+                </div>
+                <div *ngIf="dateDebut?.invalid && (dateDebut?.dirty || dateDebut?.touched)" class="invalid-feedback">
+                  <small *ngIf="dateDebut?.errors?.['required']">Date de début requise.</small>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="dateFin" class="form-label">Date de fin souhaitée*</label>
+                <div class="flatpickr-input-wrapper">
+                  <input type="text" id="dateFin" formControlName="dateFin" class="form-control flatpickr-input" placeholder="Sélectionnez la date de fin" readonly>
+                  <div class="flatpickr-calendar-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                  </div>
+                </div>
+                <div *ngIf="dateFin?.invalid && (dateFin?.dirty || dateFin?.touched)" class="invalid-feedback">
+                  <small *ngIf="dateFin?.errors?.['required']">Date de fin requise.</small>
+                </div>
+                <div *ngIf="demandeForm.errors?.['dateRangeInvalid'] && (dateDebut?.touched || dateFin?.touched)" class="invalid-feedback">
+                  <small>La date de fin doit être postérieure à la date de début.</small>
+                </div>
+              </div>
+                <!-- Légende pour les dates indisponibles -->
+              <div class="date-legend mt-2 mb-3">
+                <div class="legend-item">
+                  <span class="legend-color disabled-date"></span>
+                  <span class="legend-text">Dates non disponibles</span>
+                </div>
+                <div class="legend-item">
+                  <span class="legend-color selected-date"></span>
+                  <span class="legend-text">Votre sélection</span>
+                </div>
+              </div>
+              
+              <!-- Information sur les demandes multiples possibles -->
+              <div class="info-message mb-3">
+                <i class="fas fa-info-circle text-primary mr-1"></i>
+                <span>Plusieurs étudiants peuvent faire des demandes pour les mêmes dates. C'est le propriétaire qui choisira parmi les demandes reçues.</span>
+              </div>
+
+              <div class="form-group">
+                <label for="messageDemande" class="form-label">Message au propriétaire (optionnel)</label>
+                <textarea id="messageDemande" formControlName="message" rows="3" class="form-control" placeholder="Quelques mots sur vous, vos motivations..."></textarea>
+              </div>
+
+              <div *ngIf="demandeErrorMessage" class="alert alert-danger">{{ demandeErrorMessage }}</div>
+              <div *ngIf="demandeSuccessMessage" class="alert alert-success">{{ demandeSuccessMessage }}</div>
+
+              <div class="form-actions">
+                <button type="button" (click)="toggleDemandeForm()" class="btn btn-secondary">Annuler</button>
+                <button type="submit" class="btn btn-primary" [disabled]="demandeForm.invalid || isSubmittingDemande">
+                  <span *ngIf="!isSubmittingDemande">Envoyer la demande</span>
+                  <span *ngIf="isSubmittingDemande"><i class="fas fa-spinner fa-spin mr-2"></i>Envoi...</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Avis -->
+      <div class="reviews-section card">
+        <h2 class="section-title">
+          <i class="fas fa-comments"></i> Avis sur ce Logement
+        </h2>
+
+        <!-- Boutons pour laisser un avis -->
+        <div class="leave-review-buttons" *ngIf="isCurrentUserEtudiant && (canLeaveReviewLogement || canLeaveReviewProprietaire)">
+          <button *ngIf="canLeaveReviewLogement && showReviewFormType !== 'ETUDIANT_SUR_LOGEMENT'" (click)="toggleReviewForm('ETUDIANT_SUR_LOGEMENT')" class="btn btn-outline mb-2 mr-2">
+            <i class="fas fa-pencil-alt mr-2"></i> Laisser un avis sur le logement
+          </button>
+          <button *ngIf="canLeaveReviewProprietaire && showReviewFormType !== 'ETUDIANT_SUR_PROPRIETAIRE' && logement?.proprietaireId" (click)="toggleReviewForm('ETUDIANT_SUR_PROPRIETAIRE')" class="btn btn-outline mb-2">
+            <i class="fas fa-user-edit mr-2"></i> Laisser un avis sur le propriétaire
+          </button>
+        </div>
+
+        <!-- Formulaire d'avis -->
+        <div *ngIf="showReviewFormType" class="review-form-container card mt-4 mb-4 p-4">
+          <h3 class="text-lg font-semibold mb-3">
+            {{ showReviewFormType === 'ETUDIANT_SUR_LOGEMENT' ? 'Votre avis sur ce logement' : 'Votre avis sur le propriétaire' }}
+          </h3>
+          <form [formGroup]="reviewForm" (ngSubmit)="onSubmitReview(showReviewFormType)">
+            <div class="form-group mb-3">
+              <label for="rating" class="block text-sm font-medium text-gray-700 mb-1">Note (sur 5)</label>
+              <!-- Basic star rating - can be improved with clickable stars -->
+              <div class="star-rating flex">
+                <label *ngFor="let star of [1, 2, 3, 4, 5]" class="mr-1 cursor-pointer">
+                  <input type="radio" [value]="star" formControlName="rating" class="sr-only">
+                  <i class="fas fa-star" [ngClass]="{'text-yellow-400': reviewForm.get('rating')?.value >= star, 'text-gray-300': reviewForm.get('rating')?.value < star}"></i>
+                </label>
+              </div>
+              <div *ngIf="reviewForm.get('rating')?.invalid && (reviewForm.get('rating')?.dirty || reviewForm.get('rating')?.touched)" class="text-red-500 text-xs mt-1">
+                Note requise (1-5).
+              </div>
+            </div>
+
+            <div class="form-group mb-4">
+              <label for="comment" class="block text-sm font-medium text-gray-700 mb-1">Commentaire</label>
+              <textarea id="comment" formControlName="comment" rows="4" class="form-control w-full p-2 border rounded-md focus:ring-primary focus:border-primary" placeholder="Partagez votre expérience..."></textarea>
+              <div *ngIf="reviewForm.get('comment')?.invalid && (reviewForm.get('comment')?.dirty || reviewForm.get('comment')?.touched)" class="text-red-500 text-xs mt-1">
+                <span *ngIf="reviewForm.get('comment')?.errors?.['required']">Commentaire requis.</span>
+                <span *ngIf="reviewForm.get('comment')?.errors?.['minlength']">Minimum 10 caractères.</span>
+                <span *ngIf="reviewForm.get('comment')?.errors?.['maxlength']">Maximum 2000 caractères.</span>
+              </div>
+            </div>
+
+            <div *ngIf="reviewSubmissionError" class="alert alert-danger mb-3">
+              {{ reviewSubmissionError }}
+            </div>
+
+            <div class="form-actions flex justify-end space-x-3">
+              <button type="button" (click)="toggleReviewForm(null)" class="btn btn-secondary">
+                Annuler
+              </button>
+              <button type="submit" class="btn btn-primary" [disabled]="reviewForm.invalid || isSubmittingReview">
+                <i *ngIf="isSubmittingReview" class="fas fa-spinner fa-spin mr-2"></i>
+                {{ isSubmittingReview ? 'Envoi...' : 'Soumettre l\'avis' }}
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Liste des Avis -->
+        <div *ngIf="isLoadingReviews" class="text-center p-4">
+          <i class="fas fa-spinner fa-spin fa-2x text-primary"></i>
+          <p>Chargement des avis...</p>
+        </div>
+
+        <div *ngIf="!isLoadingReviews && reviewsErrorMessage" class="alert alert-warning">
+          {{ reviewsErrorMessage }}
+        </div>
+
+        <div *ngIf="!isLoadingReviews && (!reviewsPage || reviewsPage.content.length === 0) && !reviewsErrorMessage" class="text-center p-4 text-gray-500">
+          <i class="fas fa-comment-slash fa-2x mb-2"></i>
+          <p>Aucun avis pour ce logement pour le moment.</p>
+        </div>
+
+        <div *ngIf="!isLoadingReviews && reviewsPage && reviewsPage.content.length > 0">
+          <div *ngFor="let review of reviewsPage.content" class="review-item border-b border-gray-200 py-4 last:border-b-0">
+            <div class="flex items-start space-x-3">
+              <img [src]="getReviewerAvatarUrl(review.reviewerAvatarUrl)" alt="Avatar de {{review.reviewerNom}}" class="w-10 h-10 rounded-full object-cover">
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <h4 class="font-semibold text-sm">
+                    <a [routerLink]="['/proprietaire/etudiant', review.reviewerId, 'profil']" class="hover:underline text-primary cursor-pointer" *ngIf="review.reviewerId">
+                      {{ review.reviewerNom }}
+                    </a>
+                    <span *ngIf="!review.reviewerId">{{ review.reviewerNom }}</span>
+                  </h4>
+                  <span class="text-xs text-gray-500">{{ review.createdAt | date:'dd MMMM yyyy à HH:mm' }}</span>
+                </div>
+                <div class="star-rating my-1">
+                  <i *ngFor="let i of [].constructor(review.rating)" class="fas fa-star text-yellow-400 text-xs"></i>
+                  <i *ngFor="let i of [].constructor(5 - review.rating)" class="far fa-star text-gray-300 text-xs"></i>
+                </div>
+                <p class="text-sm text-gray-700 whitespace-pre-wrap">{{ review.comment }}</p>
+                <p *ngIf="review.type === 'ETUDIANT_SUR_PROPRIETAIRE'" class="text-xs text-gray-500 mt-1">
+                  (Avis sur le propriétaire)
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pagination pour les Avis -->
+          <nav *ngIf="reviewsPage && reviewsPage.totalPages > 1" aria-label="Pagination des avis" class="mt-6 flex justify-center">
+            <ul class="pagination inline-flex -space-x-px rounded-md shadow-sm">
+              <li>
+                <button (click)="goToReviewsPage(currentReviewsPage - 1)" [disabled]="currentReviewsPage === 0" 
+                        class="pagination-item rounded-l-md" [ngClass]="{'disabled-link': currentReviewsPage === 0}">
+                  Précédent
+                </button>
+              </li>
+              <li *ngFor="let pageNum of getReviewPagesArray()">
+                <button (click)="goToReviewsPage(pageNum)" 
+                        class="pagination-item" 
+                        [ngClass]="{'active-page': pageNum === currentReviewsPage, 'default-page': pageNum !== currentReviewsPage}">
+                  {{ pageNum + 1 }}
+                </button>
+              </li>
+              <li>
+                <button (click)="goToReviewsPage(currentReviewsPage + 1)" [disabled]="currentReviewsPage === (reviewsPage.totalPages - 1)" 
+                        class="pagination-item rounded-r-md" [ngClass]="{'disabled-link': currentReviewsPage === (reviewsPage.totalPages - 1)}">
+                  Suivant
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+
+    </div>
+  </div>

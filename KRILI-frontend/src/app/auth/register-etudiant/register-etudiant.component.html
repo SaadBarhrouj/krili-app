@@ -1,0 +1,190 @@
+<!-- src/app/auth/register-etudiant/register-etudiant.component.html -->
+<div class="register-page-container relative">
+
+  <!-- Bouton/Lien Retour Accueil -->
+  <div class="absolute top-4 left-4 md:top-6 md:left-6 z-10">
+    <a routerLink="/" title="Retour à l'accueil" class="back-link">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 17l-5-5m0 0l5-5m-5 5h12" /></svg>
+      Accueil
+    </a>
+  </div>
+
+  <!-- Logo et Titre KRILI -->
+  <div class="flex justify-center pt-12 mb-6 md:mb-8">
+    <div class="flex items-center">
+      <svg class="h-8 w-8 md:h-10 md:w-10 logo-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 9L12 4L21 9L12 14L3 9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 11V17L12 21L19 17V11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <h1 class="logo-text">KRILI</h1>
+    </div>
+  </div>
+
+  <!-- Conteneur du formulaire -->
+  <div class="max-w-3xl mx-auto px-4 sm:px-0">
+    <h1 class="page-title">Inscription Étudiant</h1>
+    <p class="page-subtitle">Rejoins KRILI et trouve ton logement étudiant idéal.</p>
+
+    <!-- Formulaire Angular -->
+    <form class="form-container" [formGroup]="registerEtudiantForm" (ngSubmit)="onSubmit()">
+
+      <!-- Section Informations Personnelles -->
+      <h2 class="section-title">Vos informations personnelles</h2>
+      <div class="form-grid">
+        <!-- Prénom -->
+        <div>
+          <label for="prenom" class="form-label">Prénom</label>
+          <input type="text" id="prenom" class="input-field mt-1" placeholder="Votre prénom" formControlName="prenom" [class.is-invalid]="isInvalid('prenom')">
+          <div *ngIf="isInvalid('prenom')" class="invalid-feedback"><div *ngIf="getError('prenom', 'required')">Le prénom est requis.</div></div>
+        </div>
+        <!-- Nom -->
+        <div>
+          <label for="nomDeFamille" class="form-label">Nom</label>
+          <input type="text" id="nomDeFamille" class="input-field mt-1" placeholder="Votre nom de famille" formControlName="nomDeFamille" [class.is-invalid]="isInvalid('nomDeFamille')">
+          <div *ngIf="isInvalid('nomDeFamille')" class="invalid-feedback"><div *ngIf="getError('nomDeFamille', 'required')">Le nom est requis.</div></div>
+        </div>
+        <!-- Email -->
+        <div>
+          <label for="email" class="form-label">Email</label>
+          <input type="email" id="email" class="input-field mt-1" placeholder="nom@exemple.fr" formControlName="email" [class.is-invalid]="isInvalid('email')">
+          <div *ngIf="isInvalid('email')" class="invalid-feedback">
+            <div *ngIf="getError('email', 'required')">L'email est requis.</div><div *ngIf="getError('email', 'email')">Format invalide.</div><div *ngIf="getError('email', 'emailTaken')">Email déjà utilisé.</div>
+          </div>
+        </div>
+        <!-- Téléphone -->
+        <div>
+          <label for="telephone" class="form-label">Téléphone</label>
+          <input type="tel" id="telephone" class="input-field mt-1" placeholder="06 XX XX XX XX" formControlName="telephone" [class.is-invalid]="isInvalid('telephone')">
+          <div *ngIf="isInvalid('telephone')" class="invalid-feedback"><div *ngIf="getError('telephone', 'required')">Le téléphone est requis.</div></div>
+        </div>
+
+        <!-- Groupe Mot de Passe et Confirmation -->
+        <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            <div class="password-input-container">
+              <label for="password" class="form-label">Mot de passe</label>
+              <div class="relative mt-1">
+                <input [type]="passwordFieldType" id="password" class="input-field" placeholder="Au moins 8 caractères" formControlName="password" [class.is-invalid]="isInvalid('password')">
+                <button type="button" (click)="togglePasswordVisibility()" class="password-toggle-button"><i class="fas text-sm" [ngClass]="passwordFieldType === 'password' ? 'fa-eye' : 'fa-eye-slash'"></i></button>
+              </div>
+              <div *ngIf="isInvalid('password')" class="invalid-feedback"><div *ngIf="getError('password', 'required')">Requis.</div><div *ngIf="getError('password', 'minlength')">8 caractères min.</div></div>
+              <div class="strength-bar-container mt-2"><div class="strength-bar" [ngClass]="passwordStrengthClass" [style.width.%]="passwordStrengthPercent"></div></div><p class="strength-text text-xs mt-1">Force: {{ passwordStrengthText }}</p>
+            </div>
+            <div class="password-input-container">
+              <label for="confirmPassword" class="form-label">Confirmer le mot de passe</label>
+              <div class="relative mt-1">
+                <input [type]="confirmPasswordFieldType" id="confirmPassword" class="input-field" placeholder="Retapez le mot de passe" formControlName="confirmPassword" [class.is-invalid]="isInvalid('confirmPassword', true)"> <!-- Check group error too -->
+                <button type="button" (click)="toggleConfirmPasswordVisibility()" class="password-toggle-button"><i class="fas text-sm" [ngClass]="confirmPasswordFieldType === 'password' ? 'fa-eye' : 'fa-eye-slash'"></i></button>
+              </div>
+              <div *ngIf="isInvalid('confirmPassword', true)" class="invalid-feedback">
+                <div *ngIf="getError('confirmPassword', 'required')">Requis.</div><div *ngIf="getError('confirmPassword', 'passwordMismatch') || getFormError('passwordMismatch')">Ne correspond pas.</div>
+              </div>
+            </div>
+        </div>
+
+        <!-- Photo de Profil (Optionnel) -->
+        <div class="md:col-span-2">
+          <label class="form-label">Photo de profil (Optionnel)</label>
+          <div class="flex items-center space-x-4 mt-1">
+            <div class="avatar-container">
+              <!-- Spinner de chargement tant que l'avatar n'est pas chargé -->
+              <div *ngIf="!avatarLoaded" class="avatar-loading">
+                <i class="fas fa-spinner fa-spin"></i>
+              </div>
+              <!-- L'avatar lui-même -->
+              <img [src]="avatarUrl" [ngClass]="{'opacity-0': !avatarLoaded}"
+                   (load)="avatarLoaded = true" 
+                   alt="Photo de profil" 
+                   class="avatar-preview transition-opacity duration-300">
+              <!-- Icône incitant à ajouter une photo quand c'est l'avatar par défaut -->
+              <div *ngIf="!photoPreview && avatarLoaded" class="avatar-overlay">
+                <i class="fas fa-camera"></i>
+              </div>
+            </div>
+            <div>
+              <label class="button-like-input">
+                <i class="fas fa-camera mr-2"></i>
+                <span>{{ photoPreview ? 'Changer la photo' : 'Choisir une photo' }}</span>
+                <input type="file" id="photoProfil" class="sr-only" accept="image/png, image/jpeg, image/jpg" (change)="onFileSelected($event)">
+              </label>
+              <button type="button" *ngIf="photoPreview" (click)="removePhoto()" 
+                      class="text-red-600 hover:text-red-800 text-sm mt-2 flex items-center">
+                <i class="fas fa-trash-alt mr-1"></i> Supprimer
+              </button>
+            </div>
+          </div>
+          <p class="field-help-text">Aide à personnaliser votre profil. JPG, PNG (Max 2Mo).</p>
+        </div>
+      </div>
+
+      <!-- Section Informations Études -->
+      <h2 class="section-title pt-4">Vos études</h2>
+      <div class="form-grid">
+        <!-- Ville d'étude -->
+        <div>
+          <label for="villeEtude" class="form-label">Ville d'étude</label>
+          <select id="villeEtude" class="input-field mt-1" formControlName="villeEtude" [class.is-invalid]="isInvalid('villeEtude')">
+            <option value="" disabled selected>Sélectionnez votre ville</option>
+            <option *ngFor="let ville of villes" [value]="ville.id">{{ ville.nom }}</option>
+          </select>
+          <div *ngIf="isInvalid('villeEtude')" class="invalid-feedback">
+            <div *ngIf="getError('villeEtude', 'required')">La ville d'étude est requise.</div>
+          </div>
+        </div>
+
+        <!-- Etablissement d'étude -->
+        <div>
+          <label for="etablissement" class="form-label">Établissement d'étude</label>
+          <select id="etablissement" class="input-field mt-1" formControlName="etablissement" [class.is-invalid]="isInvalid('etablissement')">
+            <option value="" disabled selected>Sélectionnez votre établissement</option>
+            <option *ngIf="etablissements.length === 0 && initialEtablissementsLoaded && registerEtudiantForm.get('villeEtude')?.value" value="" disabled>Aucun établissement trouvé pour cette ville</option>
+            <option *ngFor="let etab of etablissements" [value]="etab.id">{{ etab.nom }}</option>
+          </select>
+          <div *ngIf="isInvalid('etablissement')" class="invalid-feedback">
+            <div *ngIf="getError('etablissement', 'required')">L'établissement d'étude est requis.</div>
+          </div>
+        </div>
+
+        <!-- Filière / Programme -->
+        <div>
+          <label for="filiere" class="form-label">Filière / Programme</label>
+          <input type="text" id="filiere" class="input-field mt-1" placeholder="Ex: Informatique, Droit..." formControlName="filiere" [class.is-invalid]="isInvalid('filiere')">
+          <div *ngIf="isInvalid('filiere')" class="invalid-feedback">
+            <div *ngIf="getError('filiere', 'required')">La filière est requise.</div>
+          </div>
+        </div>
+        <!-- Année d'étude -->
+        <div>
+          <label for="anneeEtude" class="form-label">Année d'étude</label>
+          <select id="anneeEtude" class="input-field mt-1" formControlName="anneeEtude" [class.is-invalid]="isInvalid('anneeEtude')">
+            <option value="" disabled selected>Sélectionnez votre année</option>
+            <option *ngFor="let annee of anneesEtudeOptions" [value]="annee">{{ annee }}</option>
+          </select>
+          <div *ngIf="isInvalid('anneeEtude')" class="invalid-feedback">
+            <div *ngIf="getError('anneeEtude', 'required')">L'année d'étude est requise.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Conditions Générales -->
+      <div class="terms-box mt-6">
+        <div class="flex items-start">
+          <input id="terms" name="terms" type="checkbox" class="terms-checkbox" formControlName="accepteTerms" [class.is-invalid]="isInvalid('accepteTerms')">
+          <label for="terms" class="terms-label">
+            J'accepte les <a routerLink="/conditions-generales-etudiants" target="_blank" class="terms-link">Conditions Générales Étudiants</a> et la <a routerLink="/politique-confidentialite" target="_blank" class="terms-link">Politique de Confidentialité</a>.
+          </label>
+        </div>
+        <div *ngIf="isInvalid('accepteTerms')" class="invalid-feedback mt-1 pl-7" style="display: block;">Vous devez accepter les conditions.</div>
+      </div>
+
+      <!-- Messages Généraux et Bouton -->
+      <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+      <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+      <div class="pt-4">
+        <button type="submit" class="submit-button w-full" [disabled]="registerEtudiantForm.invalid || isLoading ">
+          <span *ngIf="!isLoading">Créer mon compte étudiant</span>
+          <span *ngIf="isLoading" class="loading-indicator"><svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Inscription en cours...</span>
+        </button>
+      </div>
+
+      <!-- Lien vers Connexion -->
+      <div class="text-center mt-4 pt-2 pb-4"><a routerLink="/login" class="login-link">Déjà un compte ? Se connecter</a></div>
+    </form>
+  </div>
+</div>

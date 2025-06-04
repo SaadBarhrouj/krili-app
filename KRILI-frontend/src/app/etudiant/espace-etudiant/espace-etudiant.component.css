@@ -1,0 +1,183 @@
+/* src/app/etudiant/espace-etudiant/espace-etudiant.component.css */
+:host {
+    display: block;
+  }
+  
+  .etudiant-layout {
+    display: flex;
+    min-height: calc(100vh - 64px - 89px); /* Ajuster 64px (header) et 89px (footer) si leurs tailles changent */
+    /* Fallback simple si calc() n'est pas parfait */
+    /* min-height: 80vh;  */
+  }
+  
+  .etudiant-sidebar {
+    width: 240px;
+    background-color: var(--background-alt);
+    border-right: 1px solid var(--border);
+    padding: 1.5rem 0;
+    flex-shrink: 0; /* Empêche le rétrécissement */
+  }
+  
+  :host-context(.dark) .etudiant-sidebar {
+    background-color: var(--background-alt); /* Ou une nuance légèrement différente si besoin */
+  }
+  
+  .etudiant-nav {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .nav-item {
+    display: flex;
+    align-items: center;
+    padding: 0.8rem 1.5rem;
+    color: var(--text);
+    text-decoration: none;
+    transition: background-color 0.2s, color 0.2s;
+    font-size: 0.95rem;
+  }
+  
+  .nav-item i {
+    margin-right: 1rem;
+    width: 20px; /* Pour alignement */
+    text-align: center;
+    color: var(--text-light);
+    transition: color 0.2s;
+  }
+  
+  .nav-item:hover {
+    background-color: color-mix(in srgb, var(--primary) 8%, transparent);
+  }
+  :host-context(.dark) .nav-item:hover {
+     background-color: color-mix(in srgb, var(--primary-light) 15%, transparent);
+  }
+  
+  
+  .nav-item.active-link {
+    background-color: color-mix(in srgb, var(--primary) 15%, transparent);
+    color: var(--primary);
+    font-weight: 600;
+  }
+  
+  .nav-item.active-link i {
+    color: var(--primary);
+  }
+  
+  :host-context(.dark) .nav-item.active-link {
+    background-color: color-mix(in srgb, var(--primary-light) 20%, transparent);
+    color: var(--primary-light);
+  }
+  
+  :host-context(.dark) .nav-item.active-link i {
+    color: var(--primary-light);
+  }
+  
+  /* Style optionnel pour un lien secondaire */
+   .nav-item-secondary {
+      margin-top: 1.5rem; /* Espace avant ce lien */
+      border-top: 1px dashed var(--border);
+      padding-top: 1rem;
+   }
+   .nav-item-secondary:hover {
+      color: var(--accent);
+   }
+    .nav-item-secondary:hover i {
+      color: var(--accent);
+   }
+  
+  
+  .nav-badge {
+    margin-left: auto;
+    background-color: var(--accent);
+    color: white;
+    font-size: 0.7rem;
+    padding: 0.1rem 0.4rem;
+    border-radius: 0.5rem;
+    font-weight: bold;
+  }
+  
+  .etudiant-content {
+    flex-grow: 1;
+    padding: 2rem;
+    overflow-y: auto; /* Permet le scroll si le contenu dépasse */
+  }
+  
+  /* Responsive pour petits écrans */
+  @media (max-width: 768px) {
+    .etudiant-layout {
+      flex-direction: column;
+    }
+    .etudiant-sidebar {
+      width: 100%;
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+      padding: 0.5rem 0;
+      height: auto; /* Hauteur auto en mobile */
+    }
+    .etudiant-nav {
+      flex-direction: row; /* Liens côte à côte */
+      overflow-x: auto; /* Scroll horizontal si trop de liens */
+      padding: 0 0.5rem;
+    }
+    .nav-item {
+      padding: 0.75rem 1rem;
+      flex-shrink: 0; /* Empêche les items de se réduire */
+    }
+    .nav-item span {
+       display: none; /* Cache le texte en mobile */
+    }
+     .nav-item i {
+       margin-right: 0;
+       font-size: 1.2rem;
+     }
+     .nav-item-secondary {
+        margin-top: 0;
+        border-top: none;
+        padding-top: 0.75rem;
+        margin-left: auto; /* Pousse le lien vers la droite */
+     }
+  
+    .etudiant-content {
+      padding: 1rem;
+    }
+  }
+
+
+  /* src/app/etudiant/espace-etudiant/espace-etudiant.component.css */
+/* ... (styles existants) ... */
+
+.nav-badge {
+    margin-left: auto; /* Pousse le badge à droite */
+    background-color: var(--accent);
+    color: white;
+    font-size: 0.7rem; /* text-xs */
+    font-weight: 600; /* font-semibold */
+    padding: 0.1rem 0.4rem; /* py-0.5 px-1.5 */
+    border-radius: 9999px; /* rounded-full */
+    min-width: 18px; /* Pour que le cercle soit rond même avec un chiffre */
+    text-align: center;
+    line-height: 1; /* Ajuste la hauteur */
+  }
+  
+  /* Style optionnel pour badge d'erreur */
+  .nav-badge-error {
+    margin-left: auto;
+    color: #f87171; /* text-red-400 en dark */
+    font-size: 0.8rem;
+    padding: 0 0.3rem;
+  }
+  :host-context(:not(.dark)) .nav-badge-error {
+     color: #dc2626; /* text-red-600 en light */
+  }
+  
+  /* S'assurer que le span est visible en mobile aussi */
+  @media (max-width: 768px) {
+     .nav-item span:not(.nav-badge):not(.nav-badge-error) {
+         display: none; /* Cache le texte principal */
+     }
+     .nav-badge, .nav-badge-error {
+        margin-left: 0.5rem; /* Espace après l'icône en mobile */
+        position: relative;
+        top: -5px; /* Remonte un peu le badge */
+     }
+  }

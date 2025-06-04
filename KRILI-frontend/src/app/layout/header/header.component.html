@@ -1,0 +1,69 @@
+<!-- src/app/layout/header/header.component.html -->
+<header class="app-header-student"> <!-- Utilise la classe spécifique pour le style -->
+  <div class="header-container-student">
+    <!-- Logo -->
+    <a routerLink="/" class="logo-link-student" (click)="closeUserDropdown()">
+      <svg class="logo-icon-student" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 9L12 4L21 9L12 14L3 9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M5 11V17L12 21L19 17V11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <h1 class="logo-text-student">KRILI</h1>
+    </a>
+
+    <!-- Navigation & User Area -->
+    <nav class="user-actions-student">
+      <!-- CAS 1: Un utilisateur (étudiant) est connecté -->      <ng-container *ngIf="currentUser && isStudentContext">
+        <a routerLink="/annonces" routerLinkActive="active-nav-link-student" class="nav-link-student hidden md:inline-flex" (click)="closeUserDropdown()">
+           Annonces
+        </a>
+        <a routerLink="/etudiant/favoris" routerLinkActive="active-nav-link-student" class="nav-link-student hidden md:inline-flex" (click)="closeUserDropdown()">
+          Mes favoris
+        </a>
+        <a routerLink="/etudiant/notifications" class="nav-link-student notification-icon-container-student" title="Notifications" (click)="closeUserDropdown()">
+          <i class="fas fa-bell"></i>
+          <span *ngIf="unreadNotificationCount > 0" class="notification-badge-student">
+            {{ unreadNotificationCount > 9 ? '9+' : unreadNotificationCount }}
+          </span>
+        </a>
+        <div class="relative">
+          <button (click)="toggleUserDropdown()" (keydown.escape)="closeUserDropdown()" class="user-button-student" aria-haspopup="true" [attr.aria-expanded]="isUserDropdownOpen">
+            <img [src]="getAvatarDisplayUrl()" [alt]="(currentUser.nom || 'Utilisateur') + ' avatar'" class="user-avatar-in-button-student">
+            <span class="user-name-in-button-student hidden md:inline">{{ currentUser.nom }}</span>
+            <i class="fas fa-chevron-down dropdown-arrow-student" [class.rotate-180]="isUserDropdownOpen"></i>
+          </button>
+          <div *ngIf="isUserDropdownOpen"
+             class="dropdown-menu-student"> <!-- Ajoutez @dropdownAnimation ici si vous l'implémentez -->
+            <div class="dropdown-user-info-student">
+              <p class="dropdown-user-greeting">Connecté en tant que</p>
+              <p class="dropdown-user-name-detail">{{ currentUser.nom }}</p>
+            </div>
+            <hr class="dropdown-divider-student">
+            <!-- Liens pour Étudiant -->
+            <a routerLink="/etudiant/profil" (click)="closeUserDropdown()" class="dropdown-item-student">
+                <i class="fas fa-user-circle dropdown-item-icon-student"></i>Mon Profil
+            </a>
+            <a routerLink="/etudiant/reservations" (click)="closeUserDropdown()" class="dropdown-item-student">
+                <i class="fas fa-calendar-check dropdown-item-icon-student"></i>Mes Réservations
+            </a>
+            <a routerLink="/etudiant/favoris" (click)="closeUserDropdown()" class="dropdown-item-student">
+                <i class="fas fa-heart dropdown-item-icon-student"></i>Mes Favoris
+            </a>
+            <hr class="dropdown-divider-student">
+            <button (click)="onLogoutClick()" class="dropdown-item-student logout-item-student w-full text-left">
+                <i class="fas fa-sign-out-alt dropdown-item-icon-student"></i>Déconnexion
+            </button>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- CAS 2: AUCUN utilisateur n'est connecté (visiteur sur /annonces par exemple) -->      <ng-container *ngIf="!currentUser">
+        <a routerLink="/annonces" routerLinkActive="active-nav-link-student" class="nav-link-student hidden md:inline-flex">
+          Annonces
+        </a>
+        <!-- Boutons Connexion/Inscription pour visiteur -->
+        <a routerLink="/login" class="btn-secondary text-sm px-3 py-1.5 md:px-4 md:py-2">Connexion</a>
+        <a routerLink="/register/etudiant" class="btn-accent text-sm px-3 py-1.5 md:px-4 md:py-2 hidden sm:inline-flex">S'inscrire</a>
+      </ng-container>
+    </nav>
+  </div>
+</header>

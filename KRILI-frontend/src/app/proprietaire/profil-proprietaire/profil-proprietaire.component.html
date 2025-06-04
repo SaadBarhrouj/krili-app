@@ -1,0 +1,163 @@
+<!-- =============================================================== -->
+<!-- FICHIER COMPLET : src/app/proprietaire/profil-proprietaire/profil-proprietaire.component.html (MIS ?? JOUR AVEC LOGS) -->
+<!-- =============================================================== -->
+<div class="profile-page-container"> <!-- Conteneur principal de la page -->
+
+    <!-- Titre de la Page -->
+    <div class="page-header">
+      <h1>Mon Profil Propri??taire</h1>
+      <p>G??rez vos informations personnelles et professionnelles.</p>
+    </div>
+  
+    <!-- Indicateur de chargement initial (affiche un overlay semi-transparent) -->
+    <div *ngIf="isLoading && !profileForm.value.id" class="loading-overlay">
+      <div class="loading-content card">
+        <svg class="loading-spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <p>Chargement de votre profil...</p>
+      </div>
+    </div>
+  
+    <!-- Message d'erreur de chargement initial -->
+    <div *ngIf="errorMessage && !profileForm.value.id && !isLoading" class="alert alert-danger">
+      <i class="fas fa-exclamation-triangle mr-2"></i>
+      {{ errorMessage }}
+      <button (click)="loadProfileData()" class="btn-retry ml-4">R??essayer</button>
+    </div>
+  
+    <!-- Formulaire (Affich?? d??s que les donn??es sont l?? ou en cas d'erreur de MAJ) -->
+    <!-- Utiliser [hidden] pour le masquer PENDANT le chargement initial mais garder la structure -->
+    <form *ngIf="profileForm" [hidden]="isLoading && !profileForm.value.id" [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form card">
+  
+      <!-- Affichage des messages d'erreur/succ??s de la MISE ?? JOUR -->
+      <div *ngIf="errorMessage && isEditing" class="alert alert-danger mb-6">{{ errorMessage }}</div>
+      <div *ngIf="successMessage && !isEditing" class="alert alert-success mb-6">{{ successMessage }}</div>
+  
+      <!-- Section Sup??rieure : Avatar et Actions principales -->
+      <div class="profile-top-section">
+        <!-- Affichage/Modification Avatar -->
+        <div class="avatar-edit-container">
+          <div class="avatar-display">
+            <!-- Utilise la propri??t?? currentAvatarDisplay pour afficher soit l'initial, soit le preview -->
+            <img [src]="currentAvatarDisplay" alt="Avatar" class="profile-avatar">
+            <!-- Input et overlay pour changer la photo en mode ??dition -->
+            <label *ngIf="isEditing" for="photoProfilEdit" class="avatar-edit-overlay" title="Changer la photo">
+              <i class="fas fa-camera"></i>
+              <span>Changer</span>
+            </label>
+            <input *ngIf="isEditing" type="file" id="photoProfilEdit" class="hidden" accept="image/png, image/jpeg, image/jpg" (change)="onFileSelected($event)">
+          </div>
+          <!-- Bouton pour annuler la s??lection de photo -->
+          <button *ngIf="isEditing && photoPreview && photoPreview !== initialAvatarUrl"
+                  type="button" (click)="resetPhotoSelection(true)" class="btn-remove-photo">
+             <i class="fas fa-times mr-1"></i> Annuler photo
+          </button>
+        </div>
+  
+        <!-- Infos principales et bouton Modifier/Sauvegarder -->
+        <div class="main-info-actions">
+          <div class="main-info">
+            <!-- Affiche le nom depuis le formulaire (toujours disponible m??me si disable) -->
+            <h2 class="user-name-display">{{ profileForm.get('nom')?.value || 'Nom non d??fini' }}</h2>
+            <p class="user-email-display">{{ profileForm.get('email')?.value }}</p>
+          </div>
+          <!-- Boutons Modifier / Annuler & Enregistrer -->
+          <div class="action-buttons">
+            <!-- Bouton Modifier (affich?? si PAS en mode ??dition) -->
+            <button *ngIf="!isEditing" type="button" (click)="toggleEditMode()" class="btn btn-primary">
+              <i class="fas fa-edit mr-2"></i> Modifier le profil
+            </button>
+            <!-- Boutons Annuler/Enregistrer (affich??s SI en mode ??dition) -->
+            <div *ngIf="isEditing" class="flex gap-3">
+              <button type="button" (click)="toggleEditMode()" class="btn btn-secondary">
+                Annuler
+              </button>
+              <button type="submit" class="btn btn-accent" [disabled]="profileForm.invalid || isSubmitting">
+                <span *ngIf="!isSubmitting"><i class="fas fa-save mr-2"></i> Enregistrer</span>
+                <!-- Indicateur de chargement pour la sauvegarde -->
+                <span *ngIf="isSubmitting" class="flex items-center justify-center">
+                  <svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                  Sauvegarde...
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div> <!-- Fin profile-top-section -->
+  
+      <!-- Sections d'informations -->
+      <div class="form-sections-container">
+  
+        <!-- Section Informations Personnelles -->
+        <div class="form-section">
+          <h3 class="section-heading">Informations Personnelles</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+            <!-- Champ Nom -->
+            <div class="form-group">
+              <label for="nom" class="form-label">Nom complet*</label>
+              <!-- Utilise [readOnly] pour l'affichage et la classe CSS pour le style -->
+              <input type="text" id="nom" formControlName="nom" class="input-field" [readonly]="!isEditing" [ngClass]="{'input-field-disabled': !isEditing, 'is-invalid': nom?.invalid && nom?.touched && isEditing}">
+              <div *ngIf="nom?.invalid && nom?.touched && isEditing" class="invalid-feedback">Le nom est requis.</div>
+            </div>
+            <!-- Champ T??l??phone -->
+            <div class="form-group">
+              <label for="telephone" class="form-label">T??l??phone*</label>
+              <input type="tel" id="telephone" formControlName="telephone" class="input-field" [readonly]="!isEditing" [ngClass]="{'input-field-disabled': !isEditing, 'is-invalid': telephone?.invalid && telephone?.touched && isEditing}">
+              <div *ngIf="telephone?.invalid && telephone?.touched && isEditing" class="invalid-feedback">Le t??l??phone est requis.</div>
+            </div>
+            <!-- Champ Email (Toujours d??sactiv??/lecture seule) -->
+            <div class="form-group">
+              <label for="email" class="form-label">Email</label>
+              <input type="email" id="email" formControlName="email" class="input-field-disabled" readonly>
+              <p class="field-help-text">L'email ne peut pas ??tre modifi??.</p>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Section Informations Professionnelles -->
+        <div class="form-section">
+           <h3 class="section-heading">Informations Professionnelles</h3>
+           <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+              <!-- Champ Statut -->
+              <div class="form-group">
+                 <label for="statut" class="form-label">Statut</label>
+                 <input type="text" id="statut" formControlName="statut" class="input-field-disabled" readonly>
+              </div>
+              <!-- Champ Nom Agence (Affich?? si agence) -->
+              <div class="form-group" *ngIf="profileForm.get('statut')?.value === 'agence'">
+                 <label for="nomAgence" class="form-label">Nom de l'agence</label>
+                 <input type="text" id="nomAgence" formControlName="nomAgence" class="input-field" [readonly]="!isEditing" [ngClass]="{'input-field-disabled': !isEditing}">
+              </div>
+              <!-- Champ SIRET (Affich?? si agence) -->
+              <div class="form-group" *ngIf="profileForm.get('statut')?.value === 'agence'">
+                 <label for="siret" class="form-label">SIRET</label>
+                 <input type="text" id="siret" formControlName="siret" class="input-field-disabled" readonly>
+              </div>
+           </div>
+        </div>
+  
+        <!-- Section Statistiques (Affichage seul) -->
+        <div class="form-section">
+           <h3 class="section-heading">Statistiques</h3>
+           <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+              <!-- Nombre d'abonn??s -->
+              <div class="form-group">
+                 <label class="form-label">Abonn??s ?? votre profil</label>
+                 <!-- Utilise le formControl pour afficher la valeur charg??e -->
+                 <p class="stat-display">{{ nombreAbonnes?.value ?? 0 }} ??tudiant(s)</p>
+                 <!-- Ajouter un lien si n??cessaire -->
+                 <!-- <a routerLink="/proprietaire/abonnes" class="text-xs text-blue-600 hover:underline">Voir la liste</a> -->
+              </div>
+              <!-- Vous pouvez ajouter d'autres stats ici -->
+           </div>
+        </div>
+  
+      </div> <!-- Fin Form Sections Container -->
+  
+      <!-- Note: Le bouton Enregistrer/Annuler est d??j?? dans profile-top-section -->
+  
+    </form> <!-- Fin du Formulaire -->
+  
+  </div> <!-- Fin Profile Page Container -->

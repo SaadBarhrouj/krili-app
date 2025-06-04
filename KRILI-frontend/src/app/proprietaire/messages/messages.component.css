@@ -1,0 +1,62 @@
+/* Styles for messages component */
+.conversation-item {
+  transition: all 0.2s;
+  position: relative;
+}
+
+.conversation-item:hover {
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
+.conversation-item.active-conversation {
+  background-color: rgba(59, 130, 246, 0.1);
+  border-left: 3px solid var(--primary);
+}
+
+.conversation-item.active-conversation::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background-color: var(--primary);
+}
+
+/* Messages styling */
+.message-bubble {
+  position: relative;
+  max-width: 80%;
+  word-wrap: break-word;
+}
+
+.message-bubble.sent {
+  background-color: #3b82f6;
+  color: white;
+  border-radius: 18px 18px 0 18px;
+}
+
+.message-bubble.received {
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  color: var(--text);
+  border-radius: 18px 18px 18px 0;
+}
+
+/* Custom scrollbar for the messages container */
+.messages-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.messages-body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.messages-body::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.messages-body::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}

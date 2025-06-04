@@ -1,0 +1,247 @@
+<div class="reservations-container w-full max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-6 lg:py-8">
+  <div class="page-header mb-8 pb-4 border-b border-gray-200 dark:border-gray-700">
+    <h1 class="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-100">Mes Réservations</h1>
+    <p class="text-sm md:text-base text-gray-600 dark:text-gray-400">Suivez l'état de vos demandes et gérez vos réservations.</p>
+  </div>
+
+  <!-- Indicateur de chargement -->
+  <div *ngIf="isLoading" class="text-center py-10">
+    <div class="inline-block h-10 w-10 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent" role="status">
+      <span class="sr-only">Chargement...</span>
+    </div>
+    <p class="mt-3 text-gray-600 dark:text-gray-400">Chargement de vos réservations...</p>
+  </div>
+
+  <!-- Message d'erreur -->
+  <div *ngIf="!isLoading && errorMessage" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md shadow-sm mb-6" role="alert">
+    <div class="flex items-center">
+      <i class="fas fa-exclamation-circle text-red-500 mr-3 text-lg"></i>
+      <div>
+        <p class="font-medium">Erreur lors du chargement</p>
+        <p class="text-sm">{{ errorMessage }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenu principal -->
+  <div *ngIf="!isLoading && !errorMessage">
+      <!-- Filtres améliorés -->
+    <div class="filter-section mb-8 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
+      <div class="flex items-center mb-4">
+        <i class="fas fa-filter text-primary mr-2 text-lg"></i>
+        <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-300">Filtrer par statut</h2>
+      </div>
+      <div class="filters-wrapper flex flex-wrap gap-3 items-center">
+        <button (click)="applyFilter('all')" 
+                class="filter-btn rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 flex items-center border" 
+                [class.filter-btn-active]="currentFilter === 'all'"
+                [class.bg-primary]="currentFilter === 'all'"
+                [class.text-white]="currentFilter === 'all'"
+                [class.border-primary]="currentFilter === 'all'"
+                [class.bg-gray-50]="currentFilter !== 'all'"
+                [class.dark:bg-gray-700]="currentFilter !== 'all'"
+                [class.text-gray-700]="currentFilter !== 'all'"
+                [class.dark:text-gray-300]="currentFilter !== 'all'"
+                [class.border-gray-200]="currentFilter !== 'all'"
+                [class.dark:border-gray-600]="currentFilter !== 'all'">
+          <i class="fas fa-list-ul mr-2"></i>Toutes
+        </button>
+        <button (click)="applyFilter('PENDING')" 
+                class="filter-btn rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 flex items-center border" 
+                [class.filter-btn-active]="currentFilter === 'PENDING'"
+                [class.bg-amber-500]="currentFilter === 'PENDING'"
+                [class.text-white]="currentFilter === 'PENDING'"
+                [class.border-amber-500]="currentFilter === 'PENDING'"
+                [class.bg-gray-50]="currentFilter !== 'PENDING'"
+                [class.dark:bg-gray-700]="currentFilter !== 'PENDING'"
+                [class.text-gray-700]="currentFilter !== 'PENDING'"
+                [class.dark:text-gray-300]="currentFilter !== 'PENDING'"
+                [class.border-gray-200]="currentFilter !== 'PENDING'"
+                [class.dark:border-gray-600]="currentFilter !== 'PENDING'">
+          <i class="fas fa-clock mr-2"></i>En Attente
+        </button>
+        <button (click)="applyFilter('CONFIRMED')" 
+                class="filter-btn rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 flex items-center border" 
+                [class.filter-btn-active]="currentFilter === 'CONFIRMED'"
+                [class.bg-green-500]="currentFilter === 'CONFIRMED'"
+                [class.text-white]="currentFilter === 'CONFIRMED'"
+                [class.border-green-500]="currentFilter === 'CONFIRMED'"
+                [class.bg-gray-50]="currentFilter !== 'CONFIRMED'"
+                [class.dark:bg-gray-700]="currentFilter !== 'CONFIRMED'"
+                [class.text-gray-700]="currentFilter !== 'CONFIRMED'"
+                [class.dark:text-gray-300]="currentFilter !== 'CONFIRMED'"
+                [class.border-gray-200]="currentFilter !== 'CONFIRMED'"
+                [class.dark:border-gray-600]="currentFilter !== 'CONFIRMED'">
+          <i class="fas fa-check mr-2"></i>Confirmées
+        </button>
+        <button (click)="applyFilter('ONGOING')" 
+                class="filter-btn rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 flex items-center border" 
+                [class.filter-btn-active]="currentFilter === 'ONGOING'"
+                [class.bg-blue-500]="currentFilter === 'ONGOING'"
+                [class.text-white]="currentFilter === 'ONGOING'"
+                [class.border-blue-500]="currentFilter === 'ONGOING'"
+                [class.bg-gray-50]="currentFilter !== 'ONGOING'"
+                [class.dark:bg-gray-700]="currentFilter !== 'ONGOING'"
+                [class.text-gray-700]="currentFilter !== 'ONGOING'"
+                [class.dark:text-gray-300]="currentFilter !== 'ONGOING'"
+                [class.border-gray-200]="currentFilter !== 'ONGOING'"
+                [class.dark:border-gray-600]="currentFilter !== 'ONGOING'">
+          <i class="fas fa-home mr-2"></i>En Cours
+        </button>
+        <button (click)="applyFilter('COMPLETED')" 
+                class="filter-btn rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 flex items-center border" 
+                [class.filter-btn-active]="currentFilter === 'COMPLETED'"
+                [class.bg-indigo-500]="currentFilter === 'COMPLETED'"
+                [class.text-white]="currentFilter === 'COMPLETED'"
+                [class.border-indigo-500]="currentFilter === 'COMPLETED'"
+                [class.bg-gray-50]="currentFilter !== 'COMPLETED'"
+                [class.dark:bg-gray-700]="currentFilter !== 'COMPLETED'"
+                [class.text-gray-700]="currentFilter !== 'COMPLETED'"
+                [class.dark:text-gray-300]="currentFilter !== 'COMPLETED'"
+                [class.border-gray-200]="currentFilter !== 'COMPLETED'"
+                [class.dark:border-gray-600]="currentFilter !== 'COMPLETED'">
+          <i class="fas fa-check-double mr-2"></i>Terminées
+        </button>
+        <button (click)="applyFilter('CANCELED_BY_ETUDIANT')" 
+                class="filter-btn rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 flex items-center border" 
+                [class.filter-btn-active]="currentFilter === 'CANCELED_BY_ETUDIANT'"
+                [class.bg-gray-500]="currentFilter === 'CANCELED_BY_ETUDIANT'"
+                [class.text-white]="currentFilter === 'CANCELED_BY_ETUDIANT'"
+                [class.border-gray-500]="currentFilter === 'CANCELED_BY_ETUDIANT'"
+                [class.bg-gray-50]="currentFilter !== 'CANCELED_BY_ETUDIANT'"
+                [class.dark:bg-gray-700]="currentFilter !== 'CANCELED_BY_ETUDIANT'"
+                [class.text-gray-700]="currentFilter !== 'CANCELED_BY_ETUDIANT'"
+                [class.dark:text-gray-300]="currentFilter !== 'CANCELED_BY_ETUDIANT'"
+                [class.border-gray-200]="currentFilter !== 'CANCELED_BY_ETUDIANT'"
+                [class.dark:border-gray-600]="currentFilter !== 'CANCELED_BY_ETUDIANT'">
+          <i class="fas fa-ban mr-2"></i>Annulées (Moi)
+        </button>
+        <button (click)="applyFilter('CANCELED_BY_PROPRIETAIRE')" 
+                class="filter-btn rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 flex items-center border" 
+                [class.filter-btn-active]="currentFilter === 'CANCELED_BY_PROPRIETAIRE'"
+                [class.bg-red-500]="currentFilter === 'CANCELED_BY_PROPRIETAIRE'"
+                [class.text-white]="currentFilter === 'CANCELED_BY_PROPRIETAIRE'"
+                [class.border-red-500]="currentFilter === 'CANCELED_BY_PROPRIETAIRE'"
+                [class.bg-gray-50]="currentFilter !== 'CANCELED_BY_PROPRIETAIRE'"
+                [class.dark:bg-gray-700]="currentFilter !== 'CANCELED_BY_PROPRIETAIRE'"
+                [class.text-gray-700]="currentFilter !== 'CANCELED_BY_PROPRIETAIRE'"
+                [class.dark:text-gray-300]="currentFilter !== 'CANCELED_BY_PROPRIETAIRE'"
+                [class.border-gray-200]="currentFilter !== 'CANCELED_BY_PROPRIETAIRE'"
+                [class.dark:border-gray-600]="currentFilter !== 'CANCELED_BY_PROPRIETAIRE'">
+          <i class="fas fa-times-circle mr-2"></i>Refusées
+        </button>
+      </div>
+    </div>
+
+    <!-- Message si aucune réservation avec le filtre actuel -->
+    <div *ngIf="filteredReservations.length === 0" class="empty-state text-center py-10 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg my-6 bg-gray-50 dark:bg-gray-800/50">
+      <i class="fas fa-calendar-times fa-3x text-gray-400 dark:text-gray-500 mb-4"></i>
+      <p class="text-gray-600 dark:text-gray-400 mb-3">
+        <span *ngIf="currentFilter === 'all'">Vous n'avez aucune réservation pour le moment.</span>
+        <span *ngIf="currentFilter !== 'all'">Aucune réservation trouvée pour le statut "{{ getStatutLibelle(currentFilter) }}".</span>
+      </p>
+      <a routerLink="/annonces" class="cta-button inline-block px-5 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary-dark transition-colors">
+        <i class="fas fa-search mr-2"></i>Explorer les logements
+      </a>
+    </div>    <!-- Liste des réservations -->
+    <div *ngIf="filteredReservations.length > 0" class="reservations-list space-y-6">
+      <div *ngFor="let reservation of filteredReservations" class="reservation-card bg-white dark:bg-gray-800 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300">
+        <div class="reservation-card-grid grid grid-cols-1 md:grid-cols-[280px_1fr] gap-4">
+          <!-- Image du logement -->
+          <div class="reservation-image-wrapper h-56 md:h-full w-full">
+            <a [routerLink]="['/logement', reservation.logement.id]" class="block relative h-full w-full rounded-t-lg md:rounded-t-none md:rounded-l-lg overflow-hidden">
+              <img [src]="getImageUrl(reservation.logement.photoPrincipaleUrl)"
+                   [alt]="reservation.logement.adresseLigne1"
+                   class="reservation-image w-full h-full object-cover transition-transform duration-300 hover:scale-105">
+            </a>
+          </div>
+
+          <!-- Détails de la réservation -->
+          <div class="reservation-details-wrapper p-4 md:p-5 flex flex-col h-full">
+            <div class="flex justify-between items-start mb-4">
+              <a [routerLink]="['/logement', reservation.logement.id]" class="hover:underline text-gray-800 dark:text-gray-100">
+                <h2 class="text-lg sm:text-xl font-semibold">
+                  {{ reservation.logement.type | titlecase }} - {{ reservation.logement.adresseLigne1 }}
+                </h2>
+              </a>
+              <span class="status-pill ml-2 text-xs px-3 py-1 rounded-full inline-flex items-center" [ngClass]="getStatutClass(reservation.status)">
+                <i class="mr-1" [ngClass]="{
+                  'fas fa-clock': reservation.status === 'PENDING',
+                  'fas fa-check': reservation.status === 'CONFIRMED',
+                  'fas fa-home': reservation.status === 'ONGOING',
+                  'fas fa-check-double': reservation.status === 'COMPLETED',
+                  'fas fa-ban': reservation.status === 'CANCELED_BY_ETUDIANT',
+                  'fas fa-times-circle': reservation.status === 'CANCELED_BY_PROPRIETAIRE'
+                }"></i>
+                {{ getStatutLibelle(reservation.status) }}
+              </span>
+            </div>
+            
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              <span class="font-medium">Propriétaire:</span> 
+              <a *ngIf="reservation.proprietaire" [routerLink]="['/proprietaires', reservation.proprietaire.id]" class="text-primary hover:underline">
+                {{ reservation.proprietaire.nom }}
+              </a>
+              <span *ngIf="!reservation.proprietaire">Non spécifié</span>
+            </p>
+
+            <div class="reservation-details grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm mb-4">
+              <div class="flex items-center">
+                <i class="fas fa-calendar-plus text-primary mr-2"></i>
+                <span><strong>Demandée le:</strong> {{ reservation.createdAt | date:'dd/MM/yyyy à HH:mm' }}</span>
+              </div>
+              <div class="flex items-center">
+                <i class="fas fa-tag text-primary mr-2"></i>
+                <span><strong>Prix:</strong> {{ reservation.logement.prix | currency:'MAD':'symbol':'1.0-0' }}/mois</span>
+              </div>
+              <div class="flex items-center">
+                <i class="fas fa-calendar-check text-primary mr-2"></i>
+                <span><strong>Début prévu:</strong> {{ reservation.startDate | date:'dd/MM/yyyy' }}</span>
+              </div>
+              <div class="flex items-center">
+                <i class="fas fa-calendar-times text-primary mr-2"></i>
+                <span><strong>Fin prévue:</strong> {{ reservation.endDate | date:'dd/MM/yyyy' }}</span>
+              </div>
+            </div>
+
+            <!-- Messages -->
+            <div *ngIf="reservation.messageEtudiant" class="message-box student-message mb-4 p-3 bg-gray-50 dark:bg-gray-700/60 rounded-md border border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+              <div class="font-medium mb-1">Votre message initial:</div> 
+              <div class="italic">"{{ reservation.messageEtudiant }}"</div>
+            </div>
+            
+            <div *ngIf="reservation.messageProprietaire" class="message-box owner-message mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md border border-blue-200 dark:border-blue-800 text-sm text-gray-700 dark:text-gray-300">
+              <div class="font-medium mb-1 text-blue-700 dark:text-blue-300">Réponse du propriétaire:</div>
+              <div class="italic">"{{ reservation.messageProprietaire }}"</div>
+            </div>
+            
+            <!-- Espace flexible pour pousser les actions vers le bas -->
+            <div class="flex-grow"></div>
+
+            <!-- Actions Footer -->
+            <div class="reservation-actions-footer mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 flex flex-wrap gap-3 justify-end">
+              <div *ngIf="reservation.cancelError" class="cancel-error-message text-red-600 text-sm font-medium flex-1 flex items-center">
+                <i class="fas fa-exclamation-triangle mr-2"></i>{{ reservation.cancelError }}
+              </div>
+              
+              <button *ngIf="canBeCancelled(reservation.status)" 
+                      (click)="onCancelReservation(reservation.id)" 
+                      [disabled]="reservation.isCancelling"
+                      class="btn-cancel px-4 py-2 rounded-md border border-red-300 bg-white hover:bg-red-50 text-red-600 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center">
+                <span *ngIf="!reservation.isCancelling"><i class="fas fa-times-circle mr-2"></i>Annuler ma demande</span>
+                <span *ngIf="reservation.isCancelling"><i class="fas fa-spinner fa-spin mr-2"></i>Annulation...</span>
+              </button>
+              
+              <button *ngIf="(reservation.status === 'CONFIRMED' || reservation.status === 'ONGOING') && reservation.proprietaire" 
+                      (click)="contactProprietaire(reservation.proprietaire.id, reservation.logement.id)"
+                      class="btn-contact-proprio px-4 py-2 rounded-md bg-primary hover:bg-primary-dark text-white text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                      [disabled]="!reservation.proprietaire?.id">
+                <i class="fas fa-comments mr-2"></i>Contacter propriétaire
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

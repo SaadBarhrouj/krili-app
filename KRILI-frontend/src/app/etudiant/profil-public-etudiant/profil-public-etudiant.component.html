@@ -1,0 +1,220 @@
+<!-- FICHIER: KRILI-frontend\src\app\proprietaire\profil-public-etudiant\profil-public-etudiant.component.html -->
+<div class="profile-page-container p-4 md:p-6 lg:p-8">
+  <!-- Bouton Retour -->
+  <div class="mb-6">
+    <button (click)="goBack()" class="back-button">
+      <i class="fas fa-arrow-left mr-2"></i> Retour
+    </button>
+  </div>
+
+  <!-- Chargement Profil -->
+  <div *ngIf="isLoadingProfil" class="loading-indicator">
+    <svg class="loading-spinner" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
+    <p>Chargement du profil de l'??tudiant...</p>
+  </div>
+
+  <!-- Erreur Profil -->
+  <div *ngIf="!isLoadingProfil && profilError" class="alert alert-danger">
+    <i class="fas fa-exclamation-triangle mr-2"></i> {{ profilError }}
+  </div>
+
+  <!-- Contenu du Profil de l'??tudiant -->
+  <div *ngIf="!isLoadingProfil && etudiantProfil" class="profile-content-card">
+    
+    <div class="profile-header-public">
+      <img [src]="getAvatarUrl(etudiantProfil.avatar)" [alt]="'Avatar de ' + etudiantProfil.nom" class="profile-avatar-public">
+      <div class="profile-name-email-container">
+        <h1 class="profile-name-public">{{ etudiantProfil.nom }}</h1>
+        <p class="profile-subtitle-public">Profil ??tudiant</p>
+        <div *ngIf="etudiantProfil.reviewCountFromProprietaires && etudiantProfil.reviewCountFromProprietaires > 0; else noStudentReviewsHeader" class="review-stats-public">
+          <span class="stars-public">
+            <i class="fas fa-star" *ngFor="let i of [].constructor(Math.floor(etudiantProfil.avgRatingFromProprietaires || 0))"></i>
+            <i class="fas fa-star-half-alt" *ngIf="(etudiantProfil.avgRatingFromProprietaires || 0) % 1 !== 0"></i>
+            <i class="far fa-star" *ngFor="let i of [].constructor(5 - Math.ceil(etudiantProfil.avgRatingFromProprietaires || 0))"></i>
+          </span>
+          <span class="rating-value-public">{{ etudiantProfil.avgRatingFromProprietaires | number:'1.1-1' }}</span>
+          <span class="review-count-public">({{ etudiantProfil.reviewCountFromProprietaires }} avis de propri??taires)</span>
+        </div>
+        <ng-template #noStudentReviewsHeader>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Aucun avis de propri??taire pour le moment.
+          </p>
+        </ng-template>
+      </div>
+    </div>
+
+    <!-- NOUVEAU: Bouton pour laisser un avis si propri??taire connect?? et ??ligible -->
+    <div *ngIf="isCurrentUserProprietaire && canLeaveReviewOnThisEtudiant && !showReviewForm && eligibleReservationsForReview.length > 0" class="mt-4 mb-6 text-center md:text-left">
+      <button (click)="toggleProprietaireReviewForm()" class="btn-action btn-leave-review">
+        <i class="fas fa-pencil-alt mr-2"></i> Laisser un avis sur cet ??tudiant
+      </button>
+    </div>
+    <div *ngIf="isCurrentUserProprietaire && canLeaveReviewOnThisEtudiant && eligibleReservationsForReview.length === 0 && !showReviewForm" class="mt-4 mb-6 text-sm text-gray-500 dark:text-gray-400">
+      (Vous avez d??j?? laiss?? un avis pour toutes les locations termin??es avec cet ??tudiant.)
+    </div>
+
+
+    <!-- NOUVEAU: Formulaire d'avis du propri??taire (conditionnel) -->
+    <div *ngIf="showReviewForm" class="proprietaire-review-form card my-6 p-4 md:p-6">
+      <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">
+        Votre avis sur {{ etudiantProfil?.nom }}
+      </h3>
+      <form [formGroup]="reviewFormProprietaire" (ngSubmit)="onSubmitProprietaireReview()">
+        
+        <div class="form-group mb-4" *ngIf="eligibleReservationsForReview.length > 0">
+          <label for="reservationIdForReview" class="form-label-public">
+            Pour quelle location souhaitez-vous laisser cet avis ?*
+          </label>
+          <select id="reservationIdForReview" formControlName="reservationIdForReview" class="form-select-public">
+            <option [ngValue]="null" disabled>S??lectionnez la location concern??e</option>
+            <option *ngFor="let resa of eligibleReservationsForReview" 
+                    [value]="resa.id" 
+                    [disabled]="avisSoumisPourReservationIds.has(resa.id)">
+              {{ resa.description }} 
+              <span *ngIf="avisSoumisPourReservationIds.has(resa.id)">(Avis d??j?? laiss??)</span>
+            </option>
+          </select>
+          <div *ngIf="reviewFormProprietaire.get('reservationIdForReview')?.invalid && reviewFormProprietaire.get('reservationIdForReview')?.touched" class="invalid-feedback-public">
+            Veuillez s??lectionner la location.
+          </div>
+        </div>
+        <div *ngIf="eligibleReservationsForReview.length === 0 && canLeaveReviewOnThisEtudiant && showReviewForm" class="text-sm text-red-500 dark:text-red-400 mb-3">
+          Erreur : Aucune location ??ligible trouv??e pour laisser un avis.
+        </div>
+
+        <div class="form-group mb-3">
+          <label class="form-label-public">Votre note (sur 5)*</label>
+          <div class="star-rating-public flex">
+            <label *ngFor="let star of [1, 2, 3, 4, 5]" class="mr-1 cursor-pointer">
+              <input type="radio" [id]="'rating-prop-pub-'+(etudiantProfil?.id || 'new')+'-'+star" [value]="star" formControlName="rating" class="sr-only">
+              <i class="fas fa-star text-xl" 
+                 [ngClass]="{'text-yellow-400 dark:text-yellow-300 rating-star-selected': reviewFormProprietaire.get('rating')?.value >= star, 
+                             'text-gray-300 dark:text-gray-500 rating-star-empty': reviewFormProprietaire.get('rating')?.value < star}">
+              </i>
+            </label>
+          </div>
+          <div *ngIf="reviewFormProprietaire.get('rating')?.invalid && reviewFormProprietaire.get('rating')?.touched" class="invalid-feedback-public">
+            Une note est requise.
+          </div>
+        </div>
+
+        <div class="form-group mb-4">
+          <label [for]="'comment-prop-review-public-' + (etudiantProfil?.id || 'new')" class="form-label-public">Votre commentaire*</label>
+          <textarea [id]="'comment-prop-review-public-' + (etudiantProfil?.id || 'new')" formControlName="comment" rows="4" class="form-input-public" placeholder="Partagez votre exp??rience avec cet ??tudiant..."></textarea>
+          <div *ngIf="reviewFormProprietaire.get('comment')?.invalid && reviewFormProprietaire.get('comment')?.touched" class="invalid-feedback-public">
+            <span *ngIf="reviewFormProprietaire.get('comment')?.errors?.['required']">Un commentaire est requis.</span>
+            <span *ngIf="reviewFormProprietaire.get('comment')?.errors?.['minlength']">Au moins 10 caract??res.</span>
+          </div>
+        </div>
+
+        <div *ngIf="reviewSubmissionError" class="alert alert-danger mb-3 text-sm">
+          {{ reviewSubmissionError }}
+        </div>
+
+        <div class="form-actions-public flex justify-end gap-3">
+          <button type="button" (click)="toggleProprietaireReviewForm()" class="btn-secondary-action-public">Annuler</button>
+          <button type="submit" class="btn-primary-action-public" [disabled]="reviewFormProprietaire.invalid || isSubmittingReview || !reviewFormProprietaire.get('reservationIdForReview')?.value">
+            <span *ngIf="!isSubmittingReview"><i class="fas fa-paper-plane mr-1"></i> Envoyer l'avis</span>
+            <span *ngIf="isSubmittingReview"><i class="fas fa-spinner fa-spin mr-1"></i> Envoi...</span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+
+    <div class="profile-details-section">
+      <h3 class="sub-section-title-public"><i class="fas fa-info-circle mr-2"></i>Informations Académiques</h3>
+      <div class="profile-details-grid">
+        <div class="detail-item">
+          <span class="detail-label"><i class="fas fa-university mr-2"></i>Établissement:</span>
+          <span class="detail-value">
+            {{ etablissementDisplay }}
+            <span *ngIf="isLoadingAcademicInfo" class="loading-indicator-mini">
+              <i class="fas fa-spinner fa-spin"></i>
+            </span>
+            <span *ngIf="isEtablissementResolved" class="info-badge verified">
+              <i class="fas fa-check-circle mr-1"></i> Vérifié
+            </span>
+          </span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label"><i class="fas fa-graduation-cap mr-2"></i>Filière:</span>
+          <span class="detail-value">{{ etudiantProfil.filiere || 'Non renseignée' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label"><i class="fas fa-layer-group mr-2"></i>Année d'étude:</span>
+          <span class="detail-value">{{ etudiantProfil.anneeEtude ? (etudiantProfil.anneeEtude + (etudiantProfil.anneeEtude === 1 ? 'ère année' : 'ème année')) : 'Non renseignée' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label"><i class="fas fa-map-marker-alt mr-2"></i>Ville d'étude:</span>
+          <span class="detail-value">
+            {{ villeDisplay }}
+            <span *ngIf="isLoadingAcademicInfo" class="loading-indicator-mini">
+              <i class="fas fa-spinner fa-spin"></i>
+            </span>
+            <span *ngIf="isVilleResolved" class="info-badge verified">
+              <i class="fas fa-check-circle mr-1"></i> Vérifiée
+            </span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="reviews-section-public">
+      <h3 class="sub-section-title-public"><i class="fas fa-comments mr-2"></i>Avis des Propri??taires sur cet ??tudiant</h3>
+      <div *ngIf="isLoadingReviews" class="loading-indicator-small">
+        <i class="fas fa-spinner fa-spin text-primary"></i> Chargement des avis...
+      </div>
+      <div *ngIf="!isLoadingReviews && reviewsError" class="alert alert-warning">
+        {{ reviewsError }}
+      </div>
+      <div *ngIf="!isLoadingReviews && (!reviewsPage || reviewsPage.content.length === 0) && !reviewsError" class="empty-state-reviews">
+        <i class="fas fa-comment-slash fa-2x mb-2"></i>
+        <p>Aucun propri??taire n'a encore laiss?? d'avis.</p>
+      </div>
+
+      <div *ngIf="!isLoadingReviews && reviewsPage && reviewsPage.content.length > 0" class="space-y-4">
+        <div *ngFor="let review of reviewsPage.content" class="review-item-public">
+          <div class="flex items-start space-x-3">
+            <img [src]="getReviewerAvatarUrl(review.reviewerAvatarUrl)" [alt]="'Avatar de ' + review.reviewerNom" class="reviewer-avatar-public">
+            <div class="flex-1">
+              <div class="flex items-center justify-between">
+                <h4 class="reviewer-name-public">{{ review.reviewerNom }} <span class="text-xs text-gray-400">(Propri??taire)</span></h4>
+                <span class="review-date-public">{{ review.createdAt | date:'dd MMMM yyyy' }}</span>
+              </div>
+              <div class="star-rating-public my-1">
+                <i *ngFor="let i of [].constructor(review.rating)" class="fas fa-star text-yellow-400 text-xs"></i>
+                <i *ngFor="let i of [].constructor(5 - review.rating)" class="far fa-star text-gray-300 dark:text-gray-600 text-xs"></i>
+              </div>
+              <p class="review-comment-public">{{ review.comment }}</p>
+            </div>
+          </div>
+        </div>
+
+        <nav *ngIf="reviewsPage && reviewsPage.totalPages > 1" aria-label="Pagination des avis" class="flex justify-center mt-6">
+          <ul class="pagination">
+            <li>
+              <button (click)="goToReviewsPage(currentReviewsPage - 1)" [disabled]="currentReviewsPage === 0" 
+                      class="pagination-item rounded-l-md" [ngClass]="{'disabled-link': currentReviewsPage === 0}">
+                Pr??c.
+              </button>
+            </li>
+            <li *ngFor="let pageNum of getReviewPagesArray()">
+              <button (click)="goToReviewsPage(pageNum)" 
+                      class="pagination-item" 
+                      [ngClass]="{'active-page': pageNum === currentReviewsPage, 'default-page': pageNum !== currentReviewsPage}">
+                {{ pageNum + 1 }}
+              </button>
+            </li>
+            <li>
+              <button (click)="goToReviewsPage(currentReviewsPage + 1)" [disabled]="!reviewsPage || currentReviewsPage === (reviewsPage.totalPages - 1)" 
+                      class="pagination-item rounded-r-md" [ngClass]="{'disabled-link': !reviewsPage || currentReviewsPage === (reviewsPage.totalPages - 1)}">
+                Suiv.
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>

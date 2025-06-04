@@ -1,0 +1,388 @@
+<!-- FICHIER: krili-frontend/src/app/accueil/accueil.component.html -->
+<!-- (Utilise getLogementSecondaryInfo et les méth              <div class="mt-3 flex justify-between items-end">
+                <div> <span class="font-bold text-lg" style="color: var(--text);">{{ logement.prix | number:'1.0-0' }} MAD</span> <span class="text-sm" style="color: var(--text-light);">/mois</span> </div>
+                <a [routerLink]="['/logement', logement.id]" class="btn-details">Voir détails</a>
+              </div> getBadgeIcon/getBadgeText) -->
+
+<div> <!-- Div principale -->
+  <!-- ======================= -->
+  <!-- == DESKTOP VERSION == -->
+  <!-- ======================= -->  <div class="hidden md:block" style="background-color: var(--background);">    <!-- Section Filtres -->
+    <div class="p-4 border-b sticky top-[73px] z-10 search-form-container" style="border-color: var(--border); background-color: var(--background-alt);">
+      <div *ngIf="isPremiumPage" class="mb-4 flex justify-start max-w-7xl mx-auto">
+        <a routerLink="/annonces" class="text-sm text-primary flex items-center">
+          <i class="fas fa-arrow-left mr-2"></i> Retour à toutes les annonces
+        </a>
+      </div>
+      <form #simpleSearchForm="ngForm" (ngSubmit)="onSearchSubmit()" class="flex items-center gap-4 max-w-7xl mx-auto"
+            [class.hidden]="isPremiumPage">
+        <!-- Choix Stratégie -->
+        <div class="filter-group flex-shrink-0">
+          <label for="searchStrategy" class="filter-label">Rechercher par :</label>
+          <select id="searchStrategy" name="searchStrategy" [(ngModel)]="selectedSearchStrategy" (ngModelChange)="onStrategyChange()" required class="input-field-filter text-sm">
+            <option *ngFor="let strat of searchStrategiesList" [value]="strat.value">{{ strat.label }}</option>
+          </select>
+        </div>
+        <!-- Champ de Saisie Dynamique -->
+        <div class="filter-group flex-grow" [ngSwitch]="selectedSearchStrategy">
+          <div *ngSwitchCase="'prix'" class="input-wrapper">
+            <label for="searchValuePrix" class="filter-label">Prix Maximum (MAD)</label>
+            <input type="number" id="searchValuePrix" name="searchValuePrix" [(ngModel)]="searchValue" min="0" step="50" class="input-field-filter text-sm w-full md:w-48" placeholder="Ex: 3000" required #prixInput="ngModel">
+            <div *ngIf="prixInput.invalid && prixInput.touched" class="invalid-feedback-filter text-xs">
+              <span *ngIf="prixInput.errors?.['required']">Prix requis.</span>
+              <span *ngIf="prixInput.errors?.['min']">Positif.</span>
+            </div>
+          </div>          <div *ngSwitchCase="'ville'" class="input-wrapper">
+            <label for="searchValueVille" class="filter-label">Ville</label>
+            <select id="searchValueVille" name="searchValueVille" [(ngModel)]="searchValue" class="input-field-filter text-sm w-full md:w-64" required #villeInput="ngModel">
+              <option [ngValue]="null" disabled>Sélectionnez</option>
+              <option *ngFor="let ville of availableVilles" [value]="ville.id">{{ ville.nom }}</option>
+            </select>
+            <div *ngIf="isLoadingVilles" class="filter-loading-text text-xs">Chargement...</div>
+            <div *ngIf="villeInput.invalid && villeInput.touched" class="invalid-feedback-filter text-xs">
+              <span>Requis.</span>
+            </div>
+          </div>          <div *ngSwitchCase="'etablissement'" class="input-wrapper">
+            <label for="searchValueEtablissement" class="filter-label">Établissement</label>
+            <select id="searchValueEtablissement" name="searchValueEtablissement" [(ngModel)]="searchValue" class="input-field-filter text-sm w-full md:w-72" [disabled]="isLoadingEtablissements || availableEtablissements.length === 0" required #etabInput="ngModel">
+              <option [ngValue]="null" disabled>Sélectionnez</option>
+              <option *ngFor="let etab of availableEtablissements" [value]="etab.id">{{ etab.nom }}</option>
+            </select>
+            <div *ngIf="isLoadingEtablissements" class="filter-loading-text text-xs">Chargement...</div>
+            <div *ngIf="!isLoadingEtablissements && availableEtablissements.length === 0 && !isLoadingInitial" class="filter-help-text text-xs">Aucun établ.</div>
+            <div *ngIf="etabInput.invalid && etabInput.touched" class="invalid-feedback-filter text-xs">
+              <span>Requis.</span>
+            </div>
+          </div>
+          <div *ngSwitchCase="'adresse'" class="input-wrapper">
+            <label for="searchValueAdresse" class="filter-label">Adresse / Mot-clé</label>
+            <input type="text" id="searchValueAdresse" name="searchValueAdresse" [(ngModel)]="searchValue" class="input-field-filter text-sm w-full" placeholder="Ex: Guéliz..." required #adresseInput="ngModel">
+            <div *ngIf="adresseInput.invalid && adresseInput.touched" class="invalid-feedback-filter text-xs">
+              <span>Requis.</span>
+            </div>
+          </div>
+          <div *ngSwitchCase="'type'" class="input-wrapper">
+            <label for="searchValueType" class="filter-label">Type de Logement</label>
+            <select id="searchValueType" name="searchValueType" [(ngModel)]="searchValue" class="input-field-filter text-sm w-full md:w-56" required #typeInput="ngModel">
+              <option *ngFor="let typeOpt of availableTypesForSelect" [value]="typeOpt.id">{{ typeOpt.nom }}</option>
+            </select>
+            <div *ngIf="typeInput.invalid && typeInput.touched" class="invalid-feedback-filter text-xs">
+              <span>Requis.</span>
+            </div>
+          </div>
+        </div>
+        <!-- Boutons Action -->
+        <div class="flex items-center gap-2 flex-shrink-0">
+          <button type="submit" class="btn-primary-filter text-sm" [disabled]="isLoadingSearch || simpleSearchForm.invalid || searchValue === null || (typeof searchValue === 'string' && !searchValue.trim()) && selectedSearchStrategy !== 'ville' && selectedSearchStrategy !== 'etablissement' && selectedSearchStrategy !== 'type'">
+            <i class="fas fa-search mr-1" *ngIf="!isLoadingSearch"></i> {{ isLoadingSearch ? 'Recherche...' : 'Rechercher' }}
+          </button>
+          <button type="button" (click)="resetFiltersAndSearch()" class="btn-secondary-filter text-sm" [disabled]="isLoadingSearch || isLoadingInitial">Effacer</button>
+          <!-- AJOUT/DEPLACEMENT : Bouton pour basculer la vue Carte/Liste -->
+          <button type="button" (click)="toggleMapView()"
+                  class="btn-secondary-filter text-sm py-2 px-4 rounded-md shadow hover:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                  [class.hidden]="isPremiumPage"
+                  title="{{ showMapView ? 'Afficher la liste des annonces' : 'Afficher les annonces sur la carte' }}">
+            <i class="fas mr-2" [ngClass]="showMapView ? 'fa-list' : 'fa-map-marked-alt'"></i>
+            <span class="hidden sm:inline">{{ showMapView ? 'Voir Liste' : 'Voir Carte' }}</span>
+          </button>
+        </div>
+      </form>
+      <div *ngIf="searchError && !isLoadingSearch" class="mt-2 text-red-600 dark:text-red-400 text-sm text-center max-w-7xl mx-auto"><i class="fas fa-exclamation-triangle mr-1"></i> {{ searchError }}</div>
+    </div>   
+    
+
+    <!-- AJOUT : Conteneur de la carte Leaflet (conditionnel) -->
+    <div *ngIf="showMapView" class="map-view-section max-w-7xl mx-auto card p-0 overflow-hidden mb-8 relative">
+      <!-- Ajout de la classe 'relative' pour positionner le panneau de détails -->
+      <div #mapAccueilContainer class="map-leaflet-container" style="height: 500px;">
+        <!-- Le #mapAccueilContainer est crucial pour que ViewChild fonctionne dans le .ts -->
+        <!-- Le style="height: 500px;" est important pour que la carte ait une dimension -->
+
+        <!-- Indicateur de chargement pour la carte -->
+        <div *ngIf="isLoadingMap" class="map-loading-overlay">
+          <i class="fas fa-spinner fa-spin fa-2x"></i>
+          <p class="ml-3 text-lg">Chargement de la carte...</p>
+        </div>
+      </div>
+
+      <!-- NOUVEAU: Panneau de détails du logement sur la carte -->
+      <div *ngIf="selectedLogementForPanel" class="map-logement-details-panel absolute top-0 right-0 h-full w-full sm:w-1/3 bg-white dark:bg-gray-800 shadow-lg z-[1000] p-4 overflow-y-auto transition-transform transform translate-x-0">
+        <button (click)="closeDetailsPanel()" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 z-10">
+          <i class="fas fa-times fa-lg"></i>
+        </button>
+
+        <div *ngIf="selectedLogementForPanel" class="panel-content">
+          <img [src]="getImageUrl(selectedLogementForPanel.photos?.[0])" [alt]="selectedLogementForPanel.adresseLigne1 || 'Logement'" class="w-full h-48 object-cover rounded-md mb-3">
+          <h3 class="text-lg font-semibold mb-1" style="color: var(--text);">{{ selectedLogementForPanel.type || 'Type inconnu' }}</h3>
+          <p class="text-sm mb-1" style="color: var(--text-light);" [title]="selectedLogementForPanel.adresseLigne1">{{ selectedLogementForPanel.adresseLigne1 || 'Adresse non disponible' }}</p>
+          <p class="text-lg font-bold mb-3" style="color: var(--primary);">{{ selectedLogementForPanel.prix | currency:'MAD':'symbol':'1.0-0' }} /mois</p>
+          
+          <div class="owner-info mt-2 mb-3 flex items-center">
+            <img [src]="getOwnerAvatarUrl(selectedLogementForPanel.proprietaireAvatarId)" [alt]="'Avatar de ' + (selectedLogementForPanel.proprietaireNom || 'Propriétaire')" class="w-8 h-8 rounded-full object-cover mr-2 border border-gray-300 dark:border-gray-600">
+            <div>
+              <a *ngIf="selectedLogementForPanel.proprietaireId"
+                 [routerLink]="['/proprietaires', selectedLogementForPanel.proprietaireId]"
+                 (click)="$event.stopPropagation(); closeDetailsPanel()"
+                 class="text-sm font-medium hover:underline" style="color: var(--text);">
+                {{ selectedLogementForPanel.proprietaireNom || 'Propriétaire' }}
+              </a>
+              <span *ngIf="!selectedLogementForPanel.proprietaireId" class="text-sm font-medium" style="color: var(--text);">
+                {{ selectedLogementForPanel.proprietaireNom || 'Propriétaire' }}
+              </span>
+            </div>
+          </div>
+
+          <p class="text-sm mb-2" style="color: var(--text-light);">{{ getLogementSecondaryInfo(selectedLogementForPanel) }}</p>
+          
+          <div class="flex items-center flex-wrap my-2 gap-1 text-xs min-h-[18px]" *ngIf="selectedLogementForPanel.displayBadges && selectedLogementForPanel.displayBadges.length > 0">
+            <span *ngFor="let badgeKey of selectedLogementForPanel.displayBadges" class="tag badge-dynamic" [ngClass]="getBadgeSpecificClass(badgeKey)">
+              <i [ngClass]="getBadgeIcon(badgeKey)" class="mr-1"></i> {{ getBadgeText(badgeKey) }}
+            </span>
+          </div>
+
+          <a [routerLink]="['/logement', selectedLogementForPanel.id]" (click)="closeDetailsPanel()" class="btn-primary w-full mt-3 text-center">
+            Voir les détails complets
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Annonces Premium -->
+    <div class="premium-listings-section" *ngIf="!isLoadingInitial && premiumLogements.length > 0">
+      <div class="premium-listings-container max-w-7xl mx-auto">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="premium-listings-title" *ngIf="!isPremiumPage">Annonces Premium</h2>
+          <h2 class="premium-listings-title" *ngIf="isPremiumPage">Toutes nos annonces Premium</h2>
+          <a *ngIf="premiumLogements.length > 3 && !isPremiumPage" routerLink="/premium" class="btn-accent text-sm">
+            <i class="fas fa-crown mr-1"></i> Voir toutes ({{premiumLogements.length}})
+          </a>
+        </div>
+        <div class="premium-listings-grid">
+          <div class="premium-card" *ngFor="let logement of isPremiumPage ? premiumLogements : (premiumLogements | slice:0:3)">
+            <div class="premium-badge" *ngIf="logement.niveauPremium && logement.niveauPremium !== 'STANDARD'">{{ logement.niveauPremium }}</div>
+            <div class="relative">
+              <a [routerLink]="['/logement', logement.id]"><img [src]="getImageUrl(logement.photos?.[0])" [alt]="logement.adresseLigne1 || 'Logement Premium'" class="w-full h-48 object-cover"></a>
+              <button *ngIf="isCurrentUserEtudiant" (click)="toggleFavorite(logement, $event)" class="absolute top-3 right-3 fav-button" [disabled]="logement.isFavoriteLoading"><i class="fa-heart text-lg" [ngClass]="{'fas text-accent': logement.isFavorite, 'far text-gray-500 dark:text-gray-400': !logement.isFavorite, 'fa-spinner fa-spin': logement.isFavoriteLoading}"></i></button>
+            </div>
+            <div class="p-4">
+              <a [routerLink]="['/logement', logement.id]" class="hover:underline flex-1 mr-2 block">
+                <h3 class="font-semibold truncate" style="color: var(--text);" [title]="logement.type + ' - ' + (logement.adresseLigne1 || '')">
+                  {{ logement.type || 'Type inconnu' }}
+                  <span *ngIf="logement.adresseLigne1 && logement.adresseLigne1.split(',')[0] && logement.adresseLigne1.split(',')[0].trim() !== ''"> - {{ logement.adresseLigne1.split(',')[0] }}</span>
+                  <span *ngIf="(!logement.adresseLigne1 || !logement.adresseLigne1.split(',')[0] || logement.adresseLigne1.split(',')[0].trim() === '') && logement.type"></span>
+                  <span *ngIf="!logement.type && (!logement.adresseLigne1 || !logement.adresseLigne1.split(',')[0] || logement.adresseLigne1.split(',')[0].trim() === '')">Titre Indisponible</span>
+                </h3>
+                <p class="text-xs truncate mt-0.5" style="color: var(--text-light);" [title]="getLogementSecondaryInfo(logement)">{{ getLogementSecondaryInfo(logement) }}</p>
+              </a>
+              <div class="owner-info mt-2">
+                <img [src]="getOwnerAvatarUrl(logement.proprietaireAvatarId)" [alt]="'Avatar de ' + (logement.proprietaireNom || 'Propri??taire')" class="w-6 h-6 rounded-full object-cover mr-2 border border-gray-300 dark:border-gray-600">
+                <a *ngIf="logement.proprietaireId" [routerLink]="['/proprietaires', logement.proprietaireId]" (click)="$event.stopPropagation()" class="owner-link">{{ logement.proprietaireNom || 'Propri??taire' }}</a>
+                <span *ngIf="!logement.proprietaireId" class="owner-link non-clickable">{{ logement.proprietaireNom || 'Propri??taire' }}</span>
+                <button *ngIf="isCurrentUserEtudiant && logement.proprietaireId" (click)="toggleSubscriptionToOwner(logement, $event)" class="subscribe-btn-small ml-2" [disabled]="logement.isSubscriptionLoading" [title]="logement.isSubscribedToOwner ? 'Se d??sabonner' : 'S\'abonner'"><i class="fas" [ngClass]="{'fa-user-check text-green-500': logement.isSubscribedToOwner, 'fa-user-plus text-blue-500 dark:text-blue-400': !logement.isSubscribedToOwner, 'fa-spinner fa-spin': logement.isSubscriptionLoading}"></i></button>
+              </div>
+              <!-- Badges dynamiques -->
+              <div class="flex items-center flex-wrap mt-2 gap-1 text-xs min-h-[18px]" *ngIf="logement.displayBadges && logement.displayBadges.length > 0">
+                <span *ngFor="let badgeKey of logement.displayBadges" class="tag badge-dynamic" [ngClass]="getBadgeSpecificClass(badgeKey)">
+                  <i [ngClass]="getBadgeIcon(badgeKey)" class="mr-1"></i> {{ getBadgeText(badgeKey) }}
+                </span>
+              </div>
+              <div class="flex items-center flex-wrap mt-1 gap-1 text-xs min-h-[18px]" *ngIf="logement.equipements && logement.equipements.length > 0 && (!logement.displayBadges || logement.displayBadges.length === 0)">
+                <span *ngFor="let equipement of logement.equipements | slice:0:3" class="tag">{{ equipement }}</span>
+                <span *ngIf="logement.equipements.length > 3" class="tag">...</span>
+              </div>
+              <div *ngIf="(!logement.equipements || logement.equipements.length === 0) && (!logement.displayBadges || logement.displayBadges.length === 0)" class="mt-1 h-[18px]"></div> <!-- Placeholder height -->
+              <div class="mt-3 flex justify-between items-end">
+                <div> <span class="font-bold text-lg" style="color: var(--text);">{{ logement.prix | currency:'MAD':'symbol':'1.0-0' }}</span> <span class="text-sm" style="color: var(--text-light);">/mois</span> </div>
+                <a [routerLink]="['/logement', logement.id]" class="btn-details">Voir détails</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>    <!-- Annonces Standard -->
+    <div id="standard-listings-section" class="p-6 max-w-7xl mx-auto" *ngIf="!isPremiumPage">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-bold" style="color: var(--text);"><span *ngIf="!isLoadingSearch && !isLoadingInitial">{{ standardLogements.length }} logement(s) standard</span><span *ngIf="isLoadingSearch || isLoadingInitial">Recherche...</span></h2>
+      </div>
+      <div *ngIf="isLoadingInitial || isLoadingSearch" class="text-center py-20"><svg class="animate-spin h-10 w-10 mx-auto" style="color: var(--primary);" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><p class="mt-2" style="color: var(--text-light);">Chargement...</p></div>
+      <div *ngIf="!isLoadingInitial && !isLoadingSearch">
+        <div *ngIf="paginatedStandardLogements.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="card" *ngFor="let logement of paginatedStandardLogements">
+            <div class="relative">
+              <a [routerLink]="['/logement', logement.id]"><img [src]="getImageUrl(logement.photos?.[0])" [alt]="logement.adresseLigne1 || 'Logement standard'" class="w-full h-48 object-cover"></a>
+              <button *ngIf="isCurrentUserEtudiant" (click)="toggleFavorite(logement, $event)" class="absolute top-3 right-3 fav-button" [disabled]="logement.isFavoriteLoading"><i class="fa-heart text-lg" [ngClass]="{'fas text-accent': logement.isFavorite, 'far text-gray-500 dark:text-gray-400': !logement.isFavorite, 'fa-spinner fa-spin': logement.isFavoriteLoading}"></i></button>
+              <span *ngIf="logement.statut !== 'ACTIVE'" class="status-overlay">{{ getStatutLibelle(logement.statut) }}</span>
+            </div>
+            <div class="p-4">
+              <a [routerLink]="['/logement', logement.id]" class="hover:underline flex-1 mr-2 block">
+                <h3 class="font-semibold truncate" style="color: var(--text);" [title]="logement.type + ' - ' + (logement.adresseLigne1 || '')">
+                  {{ logement.type || 'Type inconnu' }}
+                  <span *ngIf="logement.adresseLigne1 && logement.adresseLigne1.split(',')[0] && logement.adresseLigne1.split(',')[0].trim() !== ''"> - {{ logement.adresseLigne1.split(',')[0] }}</span>
+                  <span *ngIf="(!logement.adresseLigne1 || !logement.adresseLigne1.split(',')[0] || logement.adresseLigne1.split(',')[0].trim() === '') && logement.type"></span>
+                  <span *ngIf="!logement.type && (!logement.adresseLigne1 || !logement.adresseLigne1.split(',')[0] || logement.adresseLigne1.split(',')[0].trim() === '')">Titre Indisponible</span>
+                </h3>
+                <p class="text-xs truncate mt-0.5" style="color: var(--text-light);" [title]="getLogementSecondaryInfo(logement)">{{ getLogementSecondaryInfo(logement) }}</p>
+              </a>
+              <div class="owner-info mt-2">
+                <img [src]="getOwnerAvatarUrl(logement.proprietaireAvatarId)" [alt]="'Avatar de ' + (logement.proprietaireNom || 'Propri??taire')" class="w-6 h-6 rounded-full object-cover mr-2 border border-gray-300 dark:border-gray-600">
+                <a *ngIf="logement.proprietaireId" [routerLink]="['/proprietaires', logement.proprietaireId]" (click)="$event.stopPropagation()" class="owner-link">{{ logement.proprietaireNom || 'Propri??taire' }}</a>
+                <span *ngIf="!logement.proprietaireId" class="owner-link non-clickable">{{ logement.proprietaireNom || 'Propri??taire' }}</span>
+                <button *ngIf="isCurrentUserEtudiant && logement.proprietaireId" (click)="toggleSubscriptionToOwner(logement, $event)" class="subscribe-btn-small ml-2" [disabled]="logement.isSubscriptionLoading" [title]="logement.isSubscribedToOwner ? 'Se d??sabonner' : 'S\'abonner'"><i class="fas" [ngClass]="{'fa-user-check text-green-500': logement.isSubscribedToOwner, 'fa-user-plus text-blue-500 dark:text-blue-400': !logement.isSubscribedToOwner, 'fa-spinner fa-spin': logement.isSubscriptionLoading}"></i></button>
+              </div>
+              <!-- Badges dynamiques -->
+              <div class="flex items-center flex-wrap mt-2 gap-1 text-xs min-h-[18px]" *ngIf="logement.displayBadges && logement.displayBadges.length > 0">
+                <span *ngFor="let badgeKey of logement.displayBadges" class="tag badge-dynamic" [ngClass]="getBadgeSpecificClass(badgeKey)">
+                  <i [ngClass]="getBadgeIcon(badgeKey)" class="mr-1"></i> {{ getBadgeText(badgeKey) }}
+                </span>
+              </div>
+              <div class="flex items-center flex-wrap mt-1 gap-1 text-xs min-h-[18px]" *ngIf="logement.equipements && logement.equipements.length > 0 && (!logement.displayBadges || logement.displayBadges.length === 0)">
+                <span *ngFor="let equipement of logement.equipements | slice:0:3" class="tag">{{ equipement }}</span>
+                <span *ngIf="logement.equipements.length > 3" class="tag">...</span>
+              </div>
+              <div *ngIf="(!logement.equipements || logement.equipements.length === 0) && (!logement.displayBadges || logement.displayBadges.length === 0)" class="mt-1 h-[18px]"></div> <!-- Placeholder height -->
+              <div class="mt-3 flex justify-between items-end">
+                <div> <span class="font-bold text-lg" style="color: var(--text);">{{ logement.prix | currency:'MAD':'symbol':'1.0-0' }}</span> <span class="text-sm" style="color: var(--text-light);">/mois</span> </div>
+                <a [routerLink]="['/logement', logement.id]" class="btn-details">Voir détails</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="!isLoadingSearch && standardLogements.length === 0 && !searchError && premiumLogements.length === 0" class="text-center py-16 empty-state"><i class="fas fa-house-damage text-4xl mb-4 opacity-50"></i><p class="text-lg" style="color: var(--text-light);">Aucun logement disponible.</p><p class="text-sm mt-1" style="color: var(--text-light);" *ngIf="!searchError">Revenez bient??t ou essayez une autre recherche.</p></div>
+      </div>
+      <!-- Pagination -->
+      <nav *ngIf="!isLoadingInitial && !isLoadingSearch && totalPages > 1 && standardLogements.length > 0" aria-label="Pagination" class="mt-10 flex justify-center items-center space-x-2">
+        <button (click)="changePage('prev')" [disabled]="currentPage === 1" class="pagination-button"><i class="fas fa-chevron-left"></i> Pr??c??dent</button>
+        <ng-container *ngFor="let pageNum of [].constructor(totalPages); let i = index"><button *ngIf="i < 3 || i > totalPages - 4 || (i >= currentPage - 2 && i <= currentPage )" (click)="changePage(i + 1)" class="pagination-button" [class.active-page]="currentPage === (i + 1)">{{ i + 1 }}</button><span *ngIf="(i === 2 && currentPage > 5 && totalPages > 7) || (i === totalPages - 4 && currentPage < totalPages - 4 && totalPages > 7)" class="pagination-ellipsis">...</span></ng-container>
+        <button (click)="changePage('next')" [disabled]="currentPage === totalPages" class="pagination-button">Suivant <i class="fas fa-chevron-right"></i></button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- =================== -->
+  <!-- == MOBILE VERSION  == -->
+  <!-- =================== -->
+  <div class="md:hidden">
+    <!-- Header Mobile -->
+    <div class="p-2 border-b flex justify-between items-center sticky top-0 z-20" style="background-color: var(--background);">
+        <div class="flex items-center"><svg class="h-7 w-7" style="color: var(--primary);" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 9L12 4L21 9L12 14L3 9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 11V17L12 21L19 17V11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><h1 class="text-xl font-bold ml-1.5" style="color: var(--primary);">KRILI</h1></div>
+        <div class="relative"><button (click)="toggleUserMenu()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none"><i class="fas fa-user text-lg" style="color: var(--text);"></i></button><div *ngIf="isUserMenuOpen" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 z-30" style="background-color: var(--background); color: var(--text);"><a routerLink="/etudiant/profil" (click)="isUserMenuOpen = false" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700">Mon Profil</a><a routerLink="/etudiant/favoris" (click)="isUserMenuOpen = false" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700">Mes Favoris</a><a routerLink="/etudiant/reservations" (click)="isUserMenuOpen = false" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700">Mes R??servations</a><a href="#" (click)="logout(); isUserMenuOpen = false; $event.preventDefault()" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700">D??connexion</a></div></div>
+    </div>    <!-- Filtres Mobile -->
+    <div class="p-2 border-b sticky top-[57px] z-10 search-form-mobile" style="border-color: var(--border); background-color: var(--background-alt);">
+        <div *ngIf="isPremiumPage" class="mb-2">
+          <a routerLink="/annonces" class="text-xs text-primary flex items-center">
+            <i class="fas fa-arrow-left mr-1"></i> Retour aux annonces
+          </a>
+        </div>
+        <form #simpleSearchFormMobile="ngForm" (ngSubmit)="onSearchSubmit()" [class.hidden]="isPremiumPage">
+          <div class="flex-grow mb-2">
+            <label for="searchValueMobile" class="sr-only">Recherche rapide</label>
+            <div class="relative rounded-md shadow-sm">
+              <input type="text" id="searchValueMobile" name="searchValueMobile" [(ngModel)]="searchValue" (ngModelChange)="selectedSearchStrategy = 'adresse'" class="input-field-filter text-sm w-full pr-10" placeholder="Ville, quartier, école..." (keyup.enter)="onSearchSubmit()">
+              <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                <i class="fas fa-search text-gray-400"></i>
+              </div>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button type="button" (click)="openFilter('advancedMobile')" class="btn-secondary-filter text-xs flex-1">
+              <i class="fas fa-sliders-h mr-1"></i> Filtres
+            </button>
+            <button type="submit" class="btn-primary-filter text-xs flex-1" [disabled]="isLoadingSearch || simpleSearchFormMobile.invalid || searchValue === null || (typeof searchValue === 'string' && !searchValue.trim()) && selectedSearchStrategy !== 'ville' && selectedSearchStrategy !== 'etablissement' && selectedSearchStrategy !== 'type'">
+              <i class="fas fa-search mr-1"></i> {{ isLoadingSearch ? '...' : 'Chercher' }}
+            </button>
+          </div>
+        </form>
+        <div *ngIf="searchError && !isLoadingSearch" class="mt-1 text-red-600 dark:text-red-400 text-xs px-1">{{ searchError }}</div>
+    </div>    <!-- Annonces Premium Mobile -->
+    <div class="premium-listings-section-mobile" *ngIf="!isLoadingInitial && premiumLogements.length > 0">
+      <div class="flex justify-between items-center mb-2">
+        <h2 class="premium-listings-title-mobile" *ngIf="!isPremiumPage">Nos coups de coeur <i class="fas fa-star text-yellow-400 ml-1"></i></h2>
+        <h2 class="premium-listings-title-mobile" *ngIf="isPremiumPage">Toutes nos annonces Premium <i class="fas fa-crown text-yellow-400 ml-1"></i></h2>
+        <a *ngIf="premiumLogements.length > 3 && !isPremiumPage" routerLink="/premium" class="text-xs text-primary">
+          <i class="fas fa-crown mr-1"></i> Voir tout
+        </a>
+      </div>
+      <div class="premium-listings-slider">
+        <div class="premium-card-mobile" *ngFor="let logement of isPremiumPage ? premiumLogements : (premiumLogements | slice:0:3)">
+          <div class="premium-badge-mobile" *ngIf="logement.niveauPremium && logement.niveauPremium !== 'STANDARD'">{{ logement.niveauPremium }}</div>
+          <div class="relative">
+            <a [routerLink]="['/logement', logement.id]"><img [src]="getImageUrl(logement.photos?.[0])" [alt]="logement.adresseLigne1 || 'Logement Premium'" class="w-full h-36 object-cover rounded-t-lg"></a>
+            <button *ngIf="isCurrentUserEtudiant" (click)="toggleFavorite(logement, $event)" class="absolute top-2 right-2 fav-button" style="width: 30px; height: 30px;" [disabled]="logement.isFavoriteLoading"><i class="fa-heart text-base" [ngClass]="{'fas text-accent': logement.isFavorite, 'far text-gray-500 dark:text-gray-400': !logement.isFavorite, 'fa-spinner fa-spin': logement.isFavoriteLoading}"></i></button>
+          </div>
+          <div class="p-3">
+            <a [routerLink]="['/logement', logement.id]" class="block hover:underline">
+              <h3 class="font-medium text-sm truncate" style="color: var(--text);">{{ logement.type || 'Type inconnu' }}<span *ngIf="logement.adresseLigne1 && logement.adresseLigne1.split(',')[0] && logement.adresseLigne1.split(',')[0].trim() !== ''"> - {{ logement.adresseLigne1.split(',')[0] }}</span><span *ngIf="(!logement.adresseLigne1 || !logement.adresseLigne1.split(',')[0] || logement.adresseLigne1.split(',')[0].trim() === '') && logement.type"></span><span *ngIf="!logement.type && (!logement.adresseLigne1 || !logement.adresseLigne1.split(',')[0] || logement.adresseLigne1.split(',')[0].trim() === '')">Titre Indisponible</span></h3>
+              <p class="text-xs truncate mt-0.5" style="color: var(--text-light);" [title]="getLogementSecondaryInfo(logement)">{{ getLogementSecondaryInfo(logement) }}</p>
+            </a>
+            <div class="owner-info-mobile mt-1.5">
+              <img [src]="getOwnerAvatarUrl(logement.proprietaireAvatarId)" [alt]="'Avatar de ' + (logement.proprietaireNom || 'Propri??taire')" class="w-5 h-5 rounded-full object-cover mr-1.5 border border-gray-300 dark:border-gray-600">
+              <a *ngIf="logement.proprietaireId" [routerLink]="['/proprietaires', logement.proprietaireId]" (click)="$event.stopPropagation()" class="owner-link-mobile">{{ logement.proprietaireNom || 'Prop.' }}</a>
+              <span *ngIf="!logement.proprietaireId" class="owner-link-mobile non-clickable">{{ logement.proprietaireNom || 'Prop.' }}</span>
+              <button *ngIf="isCurrentUserEtudiant && logement.proprietaireId" (click)="toggleSubscriptionToOwner(logement, $event)" class="subscribe-btn-small ml-1" [disabled]="logement.isSubscriptionLoading" [title]="logement.isSubscribedToOwner ? 'D??sabonner' : 'S\'abonner'"><i class="fas" [ngClass]="{'fa-user-check text-green-500': logement.isSubscribedToOwner, 'fa-user-plus text-blue-500 dark:text-blue-400': !logement.isSubscribedToOwner, 'fa-spinner fa-spin': logement.isSubscriptionLoading}"></i></button>
+            </div>
+            <!-- Badges dynamiques mobile -->
+            <div class="tags-container-mobile min-h-[1.25rem] mt-1.5" *ngIf="logement.displayBadges && logement.displayBadges.length > 0">
+                <span *ngFor="let badgeKey of logement.displayBadges | slice:0:2" class="tag-mobile badge-dynamic-mobile" [ngClass]="getBadgeSpecificClass(badgeKey)">
+                  <i [ngClass]="getBadgeIcon(badgeKey)" class="mr-1"></i> {{ getBadgeText(badgeKey) }}
+                </span>
+                <span *ngIf="logement.displayBadges.length > 2" class="tag-mobile badge-dynamic-mobile">...</span>
+            </div>
+            <div class="tags-container-mobile min-h-[1.25rem] mt-1.5" *ngIf="logement.equipements && logement.equipements.length > 0 && (!logement.displayBadges || logement.displayBadges.length === 0)">
+              <span *ngFor="let equipement of logement.equipements | slice:0:2" class="tag-mobile">{{ equipement }}</span>
+              <span *ngIf="logement.equipements.length > 2" class="tag-mobile">...</span>
+            </div>
+            <div *ngIf="(!logement.equipements || logement.equipements.length === 0) && (!logement.displayBadges || logement.displayBadges.length === 0)" class="tags-container-mobile min-h-[1.25rem] mt-1.5"></div>              <div class="mt-2 flex justify-between items-end">
+                <div><span class="font-bold" style="color: var(--text);">{{ logement.prix | number:'1.0-0' }} MAD</span> <span class="text-xs" style="color: var(--text-light);">/mois</span></div>
+                <a [routerLink]="['/logement', logement.id]" class="btn-details-mobile">Voir</a>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>    <!-- Annonces Standard Mobile -->
+    <div class="p-4" *ngIf="!isPremiumPage">
+      <div *ngIf="isLoadingInitial || isLoadingSearch" class="text-center py-10"><svg class="animate-spin h-8 w-8 mx-auto" style="color: var(--primary);" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div>
+      <div *ngIf="!isLoadingInitial && !isLoadingSearch">
+        <div class="flex justify-between items-center mb-4"><h2 class="text-sm font-bold" style="color: var(--text);">{{ standardLogements.length }} logement(s)</h2><button (click)="openSortOptions()" class="btn-secondary-filter text-xs"><i class="fas fa-sort-amount-down mr-1"></i> Trier</button></div>
+        <div *ngIf="paginatedStandardLogements.length > 0" class="space-y-4">
+          <div class="card-mobile" *ngFor="let logement of paginatedStandardLogements">
+            <div class="relative">
+              <a [routerLink]="['/logement', logement.id]"><img [src]="getImageUrl(logement.photos?.[0])" [alt]="logement.adresseLigne1 || 'Logement'" class="w-full h-40 object-cover rounded-t-lg"></a>
+              <button *ngIf="isCurrentUserEtudiant" (click)="toggleFavorite(logement, $event)" class="absolute top-2 right-2 fav-button" [disabled]="logement.isFavoriteLoading"><i class="fa-heart text-lg" [ngClass]="{'fas text-accent': logement.isFavorite, 'far text-gray-500 dark:text-gray-400': !logement.isFavorite, 'fa-spinner fa-spin': logement.isFavoriteLoading}"></i></button>
+              <span *ngIf="logement.statut !== 'ACTIVE'" class="status-overlay">{{ getStatutLibelle(logement.statut) }}</span>
+            </div>
+            <div class="p-3">
+              <a [routerLink]="['/logement', logement.id]" class="block hover:underline">
+                <h3 class="font-medium text-sm truncate" style="color: var(--text);">{{ logement.type || 'Type inconnu' }}<span *ngIf="logement.adresseLigne1 && logement.adresseLigne1.split(',')[0] && logement.adresseLigne1.split(',')[0].trim() !== ''"> - {{ logement.adresseLigne1.split(',')[0] }}</span><span *ngIf="(!logement.adresseLigne1 || !logement.adresseLigne1.split(',')[0] || logement.adresseLigne1.split(',')[0].trim() === '') && logement.type"></span><span *ngIf="!logement.type && (!logement.adresseLigne1 || !logement.adresseLigne1.split(',')[0] || logement.adresseLigne1.split(',')[0].trim() === '')">Titre Indisponible</span></h3>
+                <p class="text-xs truncate mt-0.5" style="color: var(--text-light);" [title]="getLogementSecondaryInfo(logement)">{{ getLogementSecondaryInfo(logement) }}</p>
+              </a>
+              <div class="owner-info-mobile mt-1.5">
+                <img [src]="getOwnerAvatarUrl(logement.proprietaireAvatarId)" [alt]="'Avatar de ' + (logement.proprietaireNom || 'Propri??taire')" class="w-5 h-5 rounded-full object-cover mr-1.5 border border-gray-300 dark:border-gray-600">
+                <a *ngIf="logement.proprietaireId" [routerLink]="['/proprietaires', logement.proprietaireId]" (click)="$event.stopPropagation()" class="owner-link-mobile">{{ logement.proprietaireNom || 'Prop.' }}</a>
+                <span *ngIf="!logement.proprietaireId" class="owner-link-mobile non-clickable">{{ logement.proprietaireNom || 'Prop.' }}</span>
+                <button *ngIf="isCurrentUserEtudiant && logement.proprietaireId" (click)="toggleSubscriptionToOwner(logement, $event)" class="subscribe-btn-small ml-1" [disabled]="logement.isSubscriptionLoading" [title]="logement.isSubscribedToOwner ? 'D??sabonner' : 'S\'abonner'"><i class="fas" [ngClass]="{'fa-user-check text-green-500': logement.isSubscribedToOwner, 'fa-user-plus text-blue-500 dark:text-blue-400': !logement.isSubscribedToOwner, 'fa-spinner fa-spin': logement.isSubscriptionLoading}"></i></button>
+              </div>
+               <!-- Badges dynamiques mobile -->
+              <div class="tags-container-mobile min-h-[1.25rem] mt-1.5" *ngIf="logement.displayBadges && logement.displayBadges.length > 0">
+                  <span *ngFor="let badgeKey of logement.displayBadges | slice:0:2" class="tag-mobile badge-dynamic-mobile" [ngClass]="getBadgeSpecificClass(badgeKey)">
+                    <i [ngClass]="getBadgeIcon(badgeKey)" class="mr-1"></i> {{ getBadgeText(badgeKey) }}
+                  </span>
+                  <span *ngIf="logement.displayBadges.length > 2" class="tag-mobile badge-dynamic-mobile">...</span>
+              </div>
+              <div class="tags-container-mobile min-h-[1.25rem] mt-1.5" *ngIf="logement.equipements && logement.equipements.length > 0 && (!logement.displayBadges || logement.displayBadges.length === 0)">
+                <span *ngFor="let equipement of logement.equipements | slice:0:2" class="tag-mobile">{{ equipement }}</span>
+                <span *ngIf="logement.equipements.length > 2" class="tag-mobile">...</span>
+              </div>
+              <div *ngIf="(!logement.equipements || logement.equipements.length === 0) && (!logement.displayBadges || logement.displayBadges.length === 0)" class="tags-container-mobile min-h-[1.25rem] mt-1.5"></div>
+              <div class="mt-2 flex justify-between items-end">
+                <div> <span class="font-bold" style="color: var(--text);">{{ logement.prix | currency:'MAD':'symbol':'1.0-0' }}</span> <span class="text-xs" style="color: var(--text-light);">/mois</span> </div>
+                <a [routerLink]="['/logement', logement.id]" class="btn-details-mobile">Voir</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="!isLoadingSearch && standardLogements.length === 0 && !searchError && premiumLogements.length === 0" class="text-center py-10 empty-state"><i class="fas fa-house-damage text-3xl mb-3 opacity-50"></i><p class="text-md" style="color: var(--text-light);">Aucun logement trouv??.</p></div>
+        <nav *ngIf="!isLoadingInitial && !isLoadingSearch && totalPages > 1 && standardLogements.length > 0" aria-label="Pagination" class="mt-6 flex justify-center items-center space-x-1"><button (click)="changePage('prev')" [disabled]="currentPage === 1" class="pagination-button-mobile"><i class="fas fa-chevron-left"></i></button><span class="pagination-info-mobile">Page {{ currentPage }}/{{ totalPages }}</span><button (click)="changePage('next')" [disabled]="currentPage === totalPages" class="pagination-button-mobile"><i class="fas fa-chevron-right"></i></button></nav>
+      </div>
+    </div>
+  </div> <!-- Fin Mobile Version -->
+</div> <!-- Fin Div principale -->

@@ -1,0 +1,75 @@
+<!-- KRILI-frontend\src\app\etudiant\mes-favoris\mes-favoris.component.html -->
+<div class="favoris-container p-4 md:p-6 lg:p-8">
+  <h1 class="text-2xl font-bold mb-6" style="color: var(--text);">Mes Logements Favoris</h1>
+
+  <div *ngIf="isLoading" class="text-center py-10">
+    <svg class="animate-spin h-8 w-8 mx-auto" style="color: var(--primary);" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+    <p class="mt-2" style="color: var(--text-light);">Chargement de vos favoris...</p>
+  </div>
+
+  <div *ngIf="!isLoading && errorMessage" class="alert alert-danger">
+    <i class="fas fa-exclamation-triangle mr-2"></i> {{ errorMessage }}
+  </div>
+
+  <div *ngIf="!isLoading && !errorMessage">
+    <div *ngIf="favoriteLogements.length > 0; else noFavorites" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="card logement-card-favori" *ngFor="let logement of favoriteLogements">
+        <div class="relative">
+          <a [routerLink]="['/logement', logement.id]">
+            <img [src]="getImageUrl(logement.photos?.[0])" [alt]="logement.adresseLigne1 || 'Logement favori'" class="w-full h-48 object-cover">
+          </a>
+          <button (click)="removeFromFavorites(logement.id, $event)"
+                  class="absolute top-3 right-3 fav-button active"
+                  [disabled]="removingFavoriteId === logement.id"
+                  title="Retirer des favoris">
+            <!-- MODIFI?? ICI pour afficher soit l'ic??ne, soit le spinner -->
+            <i *ngIf="removingFavoriteId !== logement.id" class="fas fa-heart text-lg text-accent"></i>
+            <svg *ngIf="removingFavoriteId === logement.id" class="animate-spin h-5 w-5 text-accent" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+          </button>
+          <span class="premium-badge-simple" *ngIf="logement.niveauPremium && logement.niveauPremium !== 'STANDARD'">
+            {{ logement.niveauPremium }}
+          </span>
+        </div>
+        <div class="p-4">
+          <a [routerLink]="['/logement', logement.id]" class="hover:underline flex-1 mr-2 block">
+            <h3 class="font-semibold truncate" style="color: var(--text);" [title]="logement.type + ' - ' + (logement.adresseLigne1 || '')">
+              {{ logement.type || 'Type inconnu' }}
+              <span *ngIf="logement.adresseLigne1 && logement.adresseLigne1.split(',')[0] && logement.adresseLigne1.split(',')[0].trim() !== ''"> - {{ logement.adresseLigne1.split(',')[0] }}</span>
+              <span *ngIf="(!logement.adresseLigne1 || !logement.adresseLigne1.split(',')[0] || logement.adresseLigne1.split(',')[0].trim() === '') && logement.type"></span>
+              <span *ngIf="!logement.type && (!logement.adresseLigne1 || !logement.adresseLigne1.split(',')[0] || logement.adresseLigne1.split(',')[0].trim() === '')">Titre Indisponible</span>
+            </h3>
+            <p class="text-xs truncate mt-0.5" style="color: var(--text-light);" [title]="getLogementSecondaryInfo(logement)">
+              {{ getLogementSecondaryInfo(logement) }}
+            </p>
+          </a>
+          <div class="flex items-center flex-wrap mt-2 gap-1 text-xs min-h-[18px]" *ngIf="logement.displayBadges && logement.displayBadges.length > 0">
+            <span *ngFor="let badgeKey of logement.displayBadges" class="tag badge-dynamic" [ngClass]="getBadgeSpecificClass(badgeKey)">
+              <i [ngClass]="getBadgeIcon(badgeKey)" class="mr-1"></i> {{ getBadgeText(badgeKey) }}
+            </span>
+          </div>
+          <div class="owner-info mt-2" *ngIf="logement.proprietaireNom">
+            <img [src]="getOwnerAvatarUrl(logement.proprietaireAvatarId)" [alt]="'Avatar de ' + logement.proprietaireNom" class="w-5 h-5 rounded-full object-cover mr-1.5 border">
+            <span class="text-xs" style="color: var(--text-light);">Par {{ logement.proprietaireNom }}</span>
+          </div>
+          <div class="mt-3 flex justify-between items-end">
+            <div>
+              <span class="font-bold text-lg" style="color: var(--text);">{{ logement.prix | currency:'MAD':'symbol':'1.0-0' }}</span>
+              <span class="text-sm" style="color: var(--text-light);">/mois</span>
+            </div>
+            <a [routerLink]="['/logement', logement.id]" class="btn-details">Voir détails</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <ng-template #noFavorites>
+      <div class="text-center py-10 empty-state">
+        <i class="far fa-heart text-4xl mb-3 opacity-30"></i>
+        <p style="color: var(--text-light);">Vous n'avez aucun logement dans vos favoris pour le moment.</p>
+        <a routerLink="/annonces" class="btn-primary mt-4">D??couvrir des logements</a>
+      </div>
+    </ng-template>
+  </div>
+</div>

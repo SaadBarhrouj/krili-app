@@ -1,0 +1,735 @@
+/* src/app/landing/landing.component.css */
+
+/* Assurez-vous que Tailwind est correctement configuré dans votre projet Angular. */
+/* Les styles Tailwind (classes comme py-12, md:py-20, etc.) fonctionneront grâce à cette configuration. */
+
+/* Styles personnalisés repris de votre exemple */
+:root {
+    --primary: #2563EB;
+    --primary-dark: #1E40AF;
+    --primary-light: #93C5FD;
+    --primary-rgb: 37, 99, 235; /* Valeur RGB de #2563EB pour les gradients et transparence */
+    --accent: #FF5A19;
+    --accent-dark: #E64A14;
+    --accent-rgb: 255, 90, 25; /* Valeur RGB de #FF5A19 */
+    --secondary: #4ADE80; /* Note: Pas utilisé dans les exemples fournis */
+    --secondary-dark: #34D399; /* Note: Pas utilisé */
+    --background: #FFFFFF;
+    --background-alt: #F3F4F6;
+    --text: #1F2937;      /* Couleur noire/gris foncé pour le texte et le soulignement */
+    --text-light: #6B7280;
+    --border: #E5E7EB;
+}
+
+/* Appliquer la police globalement peut être fait dans styles.css, mais on le garde ici pour le composant */
+:host {
+    display: block; /* Important pour que :host fonctionne comme attendu */
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--background);
+    color: var(--text);
+    line-height: 1.7; /* Augmente légèrement la hauteur de ligne pour une meilleure lisibilité */
+    font-size: 16px; /* Taille de base de police améliorée */
+}
+
+/* Styles globaux (s'appliquent dans le contexte du composant) */
+/* Mettre scroll-behavior et scroll-padding-top dans styles.css global est souvent préférable */
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 90px; /* Augmenté pour tenir compte du header plus grand */
+}
+
+/* Typographie améliorée */
+h1 {
+    letter-spacing: -0.5px; /* Meilleur espacement des lettres pour les titres */
+}
+
+h2, h3 {
+    letter-spacing: -0.3px;
+}
+
+/* Titres de section plus grands */
+.section-title {
+    font-size: 2.5rem !important; /* Taille augmentée par rapport à text-3xl (1.875rem) */
+    font-weight: 700;
+    margin-bottom: 1.5rem !important; /* Augmentation de l'espacement en bas */
+    line-height: 1.2;
+    color: var(--text);
+}
+
+/* Section spacing */
+section {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+}
+
+/* Buttons */
+.btn-primary, .btn-accent, .btn-secondary {
+    border-radius: 0.6rem; /* Boutons légèrement plus arrondis */
+    padding: 0.875rem 1.75rem; /* Padding augmenté */
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+    text-decoration: none;
+    text-align: center;
+    cursor: pointer; /* Important pour les liens Angular */
+    letter-spacing: 0.3px; /* Léger espacement des lettres pour plus de lisibilité */
+    font-size: 1.05rem; /* Taille de police légèrement augmentée */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Ombre plus prononcée */
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    color: white;
+    box-shadow: 0 5px 15px rgba(37, 99, 235, 0.2);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+}
+
+.btn-accent {
+    background-color: var(--accent);
+    color: white;
+    box-shadow: 0 5px 15px rgba(255, 90, 25, 0.2);
+}
+
+.btn-accent:hover {
+    background-color: var(--accent-dark);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(255, 90, 25, 0.3);
+}
+
+.btn-secondary {
+    background-color: white;
+    color: var(--text);
+    border: 1px solid var(--border);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+}
+
+.btn-secondary:hover {
+    background-color: var(--background-alt);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:active, .btn-accent:active, .btn-secondary:active {
+    transform: translateY(0);
+}
+
+/* Style pour les grands boutons */
+.btn-lg {
+    padding: 1rem 2rem;
+    font-size: 1.15rem;
+    border-radius: 0.75rem;
+}
+
+/* Styles spécifiques aux boutons dans la section CTA (orange) */
+section[style*="background-color: var(--accent)"] .btn-primary.bg-white {
+    background-color: white !important; /* Override standard .btn-primary */
+    color: var(--accent) !important;
+}
+section[style*="background-color: var(--accent)"] .btn-primary.bg-white:hover {
+    background-color: rgba(255, 255, 255, 0.9) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(255, 255, 255, 0.2);
+}
+section[style*="background-color: var(--accent)"] .btn-secondary.border-white {
+    border-color: white !important;
+    color: white !important;
+    background-color: transparent;
+}
+section[style*="background-color: var(--accent)"] .btn-secondary.border-white:hover {
+    background-color: white !important;
+    color: var(--accent) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.15);
+}
+
+/* Cards */
+.card {
+    border-radius: 1.2rem; /* Coins plus arrondis */
+    overflow: hidden;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08), 0 2px 5px rgba(0, 0, 0, 0.04);
+    background-color: var(--background);
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    border: 1px solid rgba(229, 231, 235, 0.5);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1), 0 5px 10px rgba(0, 0, 0, 0.04);
+    border-color: rgba(229, 231, 235, 0.9);
+}
+
+/* Feature card */
+.feature-card {
+    border-radius: 1.2rem;
+    overflow: hidden;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08), 0 2px 5px rgba(0, 0, 0, 0.04);
+    background-color: var(--background); /* Utilise var(--background) pour être cohérent */
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    padding: 2rem;
+    border: 1px solid rgba(229, 231, 235, 0.5);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+/* Feature card background on hover */
+section[style*="background-color: var(--background-alt)"] .feature-card {
+    background-color: var(--background); /* S'assurer qu'elles sont blanches sur fond gris */
+}
+/* Feature card hover */
+.feature-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1), 0 5px 10px rgba(0, 0, 0, 0.04);
+    border-color: rgba(229, 231, 235, 0.9);
+    /* Optionnel: léger changement de fond au survol */
+    /* background-color: white; */
+}
+
+/* Equipment tags */
+.equipment-tag {
+    display: inline-flex;
+    align-items: center;
+    background-color: var(--background-alt);
+    color: var(--text);
+    border-radius: 9999px;
+    padding: 0.6rem 1.2rem; /* Padding augmenté */
+    margin-right: 0.6rem;
+    margin-bottom: 0.8rem;
+    font-size: 0.925rem; /* Taille de police augmentée */
+    border: 1px solid rgba(229, 231, 235, 0.6);
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    font-weight: 500; /* Légèrement plus gras pour une meilleure lisibilité */
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.equipment-tag:hover {
+    background-color: var(--primary-light);
+    color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(var(--primary-rgb), 0.15);
+    border-color: var(--primary);
+}
+
+.equipment-tag i {
+    margin-right: 8px;
+    transition: transform 0.3s ease;
+}
+
+.equipment-tag:hover i {
+    transform: scale(1.2);
+    color: var(--primary);
+}
+
+/* Illustration container */
+/* Containers d'illustrations modernes */
+.illustration-container {
+    width: 100%;
+    height: 100%;
+    min-height: 280px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--background-alt);
+    border-radius: 0.9rem;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 0 0 1px rgba(229, 231, 235, 0.7);
+}
+
+/* Nouveau conteneur d'illustration avec image */
+.modern-illustration-container {
+    width: 100%;
+    height: 100%;
+    min-height: 280px;
+    position: relative;
+    border-radius: 0.9rem;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.modern-illustration-container:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.15);
+}
+
+.modern-illustration-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 40%, rgba(0,0,0,0.1) 100%);
+    display: flex;
+    align-items: flex-end;
+    padding: 2rem;
+    transition: all 0.4s ease;
+}
+
+.modern-illustration-container:hover .modern-illustration-overlay {
+    background: linear-gradient(to top, 
+        rgba(var(--primary-rgb), 0.85) 0%, 
+        rgba(var(--primary-rgb), 0.5) 50%, 
+        rgba(var(--primary-rgb), 0.2) 100%);
+}
+
+.overlay-content {
+    max-width: 90%;
+}
+
+/* Container pour la mise en avant du logement */
+.showcase-container {
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.showcase-container:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(var(--primary-rgb), 0.15);
+}
+
+.showcase-image-container {
+    position: relative;
+    overflow: hidden;
+    border-top-left-radius: 0.75rem;
+    border-top-right-radius: 0.75rem;
+}
+
+.showcase-image-container img {
+    transition: transform 0.6s ease;
+}
+
+.showcase-image-container:hover img {
+    transform: scale(1.05);
+}
+
+.image-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.1) 100%);
+    padding: 1.5rem;
+    transform: translateY(100%);
+    transition: transform 0.35s ease;
+}
+
+.showcase-image-container:hover .image-overlay {
+    transform: translateY(0);
+    background: linear-gradient(to top, rgba(var(--primary-rgb), 0.75) 0%, rgba(var(--primary-rgb), 0.3) 70%, rgba(var(--primary-rgb), 0.1) 100%);
+}
+
+/* Bouton d'exploration spécial */
+.explore-btn {
+    font-weight: 700;
+    position: relative;
+    overflow: hidden;
+    background-color: var(--primary);
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+    border: none;
+    box-shadow: 0 6px 16px rgba(var(--primary-rgb), 0.25);
+}
+
+.explore-btn:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 24px rgba(var(--primary-rgb), 0.35);
+    background-color: var(--primary-dark);
+}
+
+.explore-btn:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.2), transparent);
+    transform: translateX(-100%);
+}
+
+.explore-btn:hover:before {
+    animation: shine 1.5s ease-out;
+}
+
+.explore-btn i {
+    transition: transform 0.3s ease;
+}
+
+.explore-btn:hover i {
+    transform: translateX(3px);
+}
+
+@keyframes shine {
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* Equipment button styling */
+.equipment-btn {
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 6px 16px rgba(var(--accent-rgb), 0.25);
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.equipment-btn:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 10px 20px rgba(var(--accent-rgb), 0.35);
+}
+
+.equipment-btn i {
+    transition: transform 0.3s ease;
+}
+
+.equipment-btn:hover i {
+    transform: translateX(3px) scale(1.2);
+}
+
+.illustration { /* Si vous utilisez une classe .illustration pour des images */
+    width: 100%;
+    height: auto;
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+}
+
+/* Navigation and header improvements */
+header {
+    background-color: var(--background);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    /* backdrop-filter n'est pas supporté partout, fallback sur couleur semi-transparente */
+    background-color: rgba(255, 255, 255, 0.98);
+    transition: all 0.3s ease;
+    border-bottom: 1px solid var(--border); /* Assurer la bordure via CSS */
+    padding: 0.75rem 0; /* Padding vertical augmenté */
+}
+
+/* Styles pour les liens spécifiques du menu desktop */
+header a.text-sm.font-medium {
+    position: relative;
+    color: var(--text); /* Couleur de base */
+    text-decoration: none; /* Pas de soulignement par défaut */
+    padding-bottom: 6px; /* Espace pour le soulignement */
+    margin-bottom: -6px; /* Compenser le padding */
+    font-size: 1rem; /* Taille de police augmentée */
+    font-weight: 500;
+}
+
+/* Styles pour le pseudo-élément ::after (le soulignement animé) */
+header a.text-sm.font-medium::after {
+    content: '';
+    position: absolute;
+    bottom: 0px; /* Positionné juste en dessous du texte */
+    left: 0;
+    width: 0; /* Commence caché (largeur 0) */
+    height: 2px; /* Épaisseur du soulignement */
+    background-color: var(--text); /* Couleur du soulignement (noir/gris foncé) */
+    transition: width 0.3s ease; /* Animation de la largeur */
+}
+
+/* Styles pour le lien LORSQU'IL EST SURVOLÉ (:hover) */
+header a.text-sm.font-medium:hover {
+    color: var(--text); /* Force la couleur du texte à RESTER la même au survol */
+}
+
+/* Styles pour le pseudo-élément ::after LORSQUE LE LIEN EST SURVOLÉ */
+header a.text-sm.font-medium:hover::after {
+    width: 100%; /* Fait apparaître le soulignement */
+}
+
+/* Styles pour la navigation mobile */
+.md\:hidden a.text-xs.font-medium {
+    position: relative;
+    color: var(--text);
+    padding-bottom: 4px; /* Espace pour le soulignement */
+    margin-bottom: -4px; /* Compenser */
+}
+
+.md\:hidden a.text-xs.font-medium::after {
+    content: '';
+    position: absolute;
+    bottom: 0px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 2px;
+    background-color: var(--text); /* Couleur du soulignement (noir/gris foncé) */
+    transition: width 0.3s ease;
+}
+.md\:hidden a.text-xs.font-medium:hover {
+   color: var(--text); /* Garder la couleur du texte */
+}
+
+.md\:hidden a.text-xs.font-medium:hover::after {
+    width: 80%; /* Ou 100% si vous préférez */
+}
+
+/* Hover effects for list items (checkmarks sections) */
+ul.space-y-4 li, ul.space-y-2 li {
+    transition: transform 0.2s ease;
+    padding: 0.4rem 0; /* Ajout d'un espacement vertical */
+}
+
+ul.space-y-4 li:hover, ul.space-y-2 li:hover {
+    transform: translateX(3px);
+}
+
+/* Section enhancements */
+section {
+    position: relative;
+    overflow: hidden; /* Attention, peut cacher des ombres ou éléments positionnés */
+    padding: 5rem 0; /* Espacement vertical standard des sections augmenté */
+}
+
+/* Enhanced CTA section background effect */
+section[style*="background-color: var(--accent)"] {
+    position: relative;
+    padding: 6rem 0;
+    overflow: hidden;
+}
+
+section[style*="background-color: var(--accent)"]::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 75% 25%, rgba(255, 255, 255, 0.15) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+section[style*="background-color: var(--accent)"]::after {
+    content: '';
+    position: absolute;
+    bottom: -50px;
+    right: -50px;
+    width: 250px;
+    height: 250px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+    pointer-events: none;
+    animation: pulse 8s infinite alternate ease-in-out;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.6; transform: scale(1); }
+    100% { opacity: 0.9; transform: scale(1.3); }
+}
+
+/* Improved number circles in how it works section */
+.feature-card .w-16.h-16 { /* Cible spécifiquement les cercles numérotés */
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    background-color: var(--primary); /* Assure la couleur de fond via CSS */
+    color: white; /* Assure la couleur du texte via CSS */
+    width: 5rem !important;
+    height: 5rem !important;
+    font-size: 1.75rem !important;
+}
+
+.feature-card:hover .w-16.h-16 {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+/* Premium option styles (non utilisées dans le HTML fourni, mais présentes dans le CSS original) */
+.premium-option {
+    border: 2px solid var(--border);
+    border-radius: 0.75rem;
+    padding: 1.75rem;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.premium-option:hover {
+    border-color: var(--accent);
+    background-color: rgba(255, 90, 25, 0.05);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(255, 90, 25, 0.08);
+}
+
+.premium-option.featured {
+    border-color: var(--accent);
+    background-color: rgba(255, 90, 25, 0.05);
+    box-shadow: 0 6px 16px rgba(255, 90, 25, 0.1);
+}
+
+.premium-option ul {
+   flex-grow: 1;
+}
+
+/* Footer enhancements */
+footer {
+    position: relative;
+    background-color: var(--background-alt); /* Fond gris clair pour le footer */
+    padding-top: 5rem;
+    padding-bottom: 3rem;
+}
+
+footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--primary-light), transparent);
+}
+
+footer a {
+    transition: color 0.3s ease;
+    color: var(--text-light); /* Couleur de base des liens footer */
+}
+
+footer a:hover {
+    color: var(--primary) !important; /* Survol en bleu primaire */
+}
+footer h4 { /* Style pour les titres des colonnes footer */
+    color: var(--text);
+}
+
+/* Icon containers general hover */
+.rounded-full {
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover .rounded-full, /* Cible les icônes dans les feature cards */
+.card:hover .rounded-full { /* Cible les icônes dans les cartes normales (ex: équipement) */
+    transform: scale(1.1);
+}
+
+/* Amélioration des témoignages */
+.card .flex div.w-12.h-12 { /* Cible les conteneurs d'icônes/avatars */
+    border: 2px solid var(--primary-light);
+    transition: transform 0.3s ease;
+    width: 3.5rem !important;
+    height: 3.5rem !important;
+    /* Assurez-vous que les classes Tailwind sont bien appliquées dans le HTML */
+    /* w-12 h-12 rounded-full overflow-hidden flex items-center justify-center */
+}
+.card .flex div.w-12.h-12.bg-primary-light { /* Style spécifique si fond bleu clair */
+   background-color: var(--primary-light);
+}
+
+.card:hover .flex div.w-12.h-12 {
+    transform: scale(1.08);
+}
+
+/* Amélioration des tailles de texte */
+.text-lg {
+    font-size: 1.125rem !important;
+}
+
+.text-xl {
+    font-size: 1.25rem !important;
+}
+
+.text-2xl {
+    font-size: 1.5rem !important;
+}
+
+.text-3xl {
+    font-size: 1.875rem !important;
+}
+
+.text-sm {
+    font-size: 0.95rem !important;
+}
+
+p {
+    font-size: 1.05rem;
+}
+
+/* Media queries pour les appareils plus petits */
+/* Feature image cards (grid of equipment images) */
+.feature-image-card {
+    position: relative;
+    border-radius: 1rem;
+    overflow: hidden;
+    height: 180px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s ease;
+}
+
+.feature-image-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.feature-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.feature-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.5) 50%, rgba(0, 0, 0, 0) 100%);
+    transition: background 0.3s ease;
+}
+
+.feature-image-card:hover .feature-overlay {
+    background: linear-gradient(to top, rgba(var(--primary-rgb), 0.85) 0%, rgba(var(--primary-rgb), 0.5) 50%, rgba(var(--primary-rgb), 0) 100%);
+}
+
+@media (max-width: 768px) {
+    .btn-primary, .btn-accent, .btn-secondary {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+    }
+    
+    h1, h2 {
+        word-wrap: break-word;
+    }
+    
+    section {
+        padding: 3.5rem 0;
+    }
+    
+    .text-3xl {
+        font-size: 1.65rem !important;
+    }
+
+    .feature-image-card {
+        height: 140px;
+    }
+
+    .feature-overlay {
+        padding: 0.75rem;
+    }
+
+    .feature-overlay h4 {
+        font-size: 0.9rem;
+    }
+
+    .feature-overlay p {
+        font-size: 0.7rem;
+    }
+}

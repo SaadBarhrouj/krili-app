@@ -1,0 +1,274 @@
+<div class="statistiques-container p-4 md:p-6 lg:p-8">
+  <!-- En-tête de la page -->
+  <div class="page-header mb-6 pb-4 border-b border-[var(--border)]">
+    <h1 class="text-2xl md:text-3xl font-bold text-[var(--text)]">Statistiques et Performance</h1>
+    <p class="text-sm md:text-base text-[var(--text-light)]">Analysez les performances de vos annonces et suivez l'activité de vos logements</p>
+  </div>
+
+  <!-- Indicateur de chargement -->
+  <div *ngIf="isLoading" class="loading-indicator flex flex-col items-center justify-center py-12">
+    <svg class="w-12 h-12 animate-spin text-blue-600" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+    <p class="mt-4 text-[var(--text)]">Chargement des statistiques...</p>
+  </div>
+
+  <!-- Message d'erreur -->
+  <div *ngIf="!isLoading && errorMessage" class="alert alert-danger p-4 bg-red-100 text-red-800 border border-red-200 rounded mb-6">
+    <i class="fas fa-exclamation-triangle mr-2"></i> {{ errorMessage }}
+  </div>
+
+  <!-- Contenu principal - Statistiques -->
+  <div *ngIf="!isLoading && !errorMessage" class="stats-content">
+    <!-- Période de filtrage -->
+    <div class="filter-period mb-8 flex flex-wrap items-center justify-between">
+      <div class="stats-period-selector">
+        <div class="inline-flex rounded-md shadow-sm" role="group">
+          <button
+            *ngFor="let period of periodOptions"
+            type="button"
+            (click)="setPeriod(period.value)"
+            [class.active-period]="currentPeriod === period.value"
+            class="period-btn px-4 py-2 text-sm font-medium border"
+          >
+            {{ period.label }}
+          </button>
+        </div>
+      </div>
+      
+      <div class="stats-date-range mt-4 md:mt-0">
+        <span class="text-sm font-medium text-[var(--text-light)] mr-2">Période : </span>
+        <span class="text-sm font-bold text-[var(--text)]">{{ getDateRangeLabel() }}</span>
+      </div>
+    </div>
+
+    <!-- Cartes de statistiques principales -->
+    <div class="stats-highlights grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <!-- Vues -->
+      <div class="stat-card bg-white border border-[var(--border)] rounded-lg p-6 hover:shadow-md transition-shadow">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-sm font-medium text-[var(--text-light)] mb-1">Total des vues</p>
+            <h3 class="text-2xl font-bold text-[var(--text)]">{{ formatNumber(statsData.totalViews) }}</h3>
+          </div>
+          <div class="stat-icon bg-blue-100 p-3 rounded-lg">
+            <i class="fas fa-eye text-blue-500"></i>
+          </div>
+        </div>
+        <div class="mt-4 flex items-center">
+          <span [class.text-green-500]="statsData.viewsChange > 0" [class.text-red-500]="statsData.viewsChange < 0" class="text-sm font-medium">
+            <i [class.fa-arrow-up]="statsData.viewsChange > 0" [class.fa-arrow-down]="statsData.viewsChange < 0" class="fas mr-1"></i>
+            {{ Math.abs(statsData.viewsChange) }}%
+          </span>
+          <span class="text-xs text-[var(--text-light)] ml-2">vs période précédente</span>
+        </div>
+      </div>
+      
+      <!-- Demandes -->
+      <div class="stat-card bg-white border border-[var(--border)] rounded-lg p-6 hover:shadow-md transition-shadow">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-sm font-medium text-[var(--text-light)] mb-1">Demandes reçues</p>
+            <h3 class="text-2xl font-bold text-[var(--text)]">{{ statsData.totalRequests }}</h3>
+          </div>
+          <div class="stat-icon bg-amber-100 p-3 rounded-lg">
+            <i class="fas fa-file-alt text-amber-500"></i>
+          </div>
+        </div>
+        <div class="mt-4 flex items-center">
+          <span [class.text-green-500]="statsData.requestsChange > 0" [class.text-red-500]="statsData.requestsChange < 0" class="text-sm font-medium">
+            <i [class.fa-arrow-up]="statsData.requestsChange > 0" [class.fa-arrow-down]="statsData.requestsChange < 0" class="fas mr-1"></i>
+            {{ Math.abs(statsData.requestsChange) }}%
+          </span>
+          <span class="text-xs text-[var(--text-light)] ml-2">vs période précédente</span>
+        </div>
+      </div>
+      
+      <!-- Acceptations -->
+      <div class="stat-card bg-white border border-[var(--border)] rounded-lg p-6 hover:shadow-md transition-shadow">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-sm font-medium text-[var(--text-light)] mb-1">Demandes acceptées</p>
+            <h3 class="text-2xl font-bold text-[var(--text)]">{{ statsData.acceptedRequests }}</h3>
+          </div>
+          <div class="stat-icon bg-green-100 p-3 rounded-lg">
+            <i class="fas fa-check-circle text-green-500"></i>
+          </div>
+        </div>
+        <div class="mt-4 flex items-center">
+          <span class="text-sm font-medium">
+            {{ statsData.conversionRate }}%
+          </span>
+          <span class="text-xs text-[var(--text-light)] ml-2">taux d'acceptation</span>
+        </div>
+      </div>
+      
+      <!-- Favoris -->
+      <div class="stat-card bg-white border border-[var(--border)] rounded-lg p-6 hover:shadow-md transition-shadow">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-sm font-medium text-[var(--text-light)] mb-1">Ajouts aux favoris</p>
+            <h3 class="text-2xl font-bold text-[var(--text)]">{{ statsData.totalFavorites }}</h3>
+          </div>
+          <div class="stat-icon bg-red-100 p-3 rounded-lg">
+            <i class="fas fa-heart text-red-500"></i>
+          </div>
+        </div>
+        <div class="mt-4 flex items-center">
+          <span [class.text-green-500]="statsData.favoritesChange > 0" [class.text-red-500]="statsData.favoritesChange < 0" class="text-sm font-medium">
+            <i [class.fa-arrow-up]="statsData.favoritesChange > 0" [class.fa-arrow-down]="statsData.favoritesChange < 0" class="fas mr-1"></i>
+            {{ Math.abs(statsData.favoritesChange) }}%
+          </span>
+          <span class="text-xs text-[var(--text-light)] ml-2">vs période précédente</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Graphiques et tableaux -->
+    <div class="stats-charts grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- Graphique des visites -->
+      <div class="chart-card bg-white border border-[var(--border)] rounded-lg p-6">
+        <h3 class="text-lg font-semibold text-[var(--text)] mb-4">Évolution des visites</h3>
+        <div class="chart-container h-64 flex items-center justify-center">
+          <div class="chart-placeholder">
+            <!-- Graphique représentatif (version statique) -->
+            <div class="chart-bars flex items-end h-48 space-x-4">
+              <div *ngFor="let item of statsData.viewsChart" class="chart-bar relative group">
+                <div class="h-full flex flex-col justify-end">
+                  <div class="w-10 bg-blue-500 rounded-t" [style.height.%]="getBarHeight(item.value, statsData.viewsChart)"></div>
+                </div>
+                <div class="text-xs text-center text-[var(--text-light)] mt-2 w-10 overflow-hidden">{{ item.label }}</div>
+                <!-- Tooltip au survol -->
+                <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 bg-[var(--text)] text-white px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                  {{ item.value }} visites
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Répartition des demandes -->
+      <div class="chart-card bg-white border border-[var(--border)] rounded-lg p-6">
+        <h3 class="text-lg font-semibold text-[var(--text)] mb-4">Répartition des demandes</h3>
+        <div class="chart-container h-64">
+          <div class="donut-chart-container w-full h-full flex items-center justify-center">
+            <!-- Donut Chart (version statique) -->
+            <div class="donut-chart-wrapper relative">
+              <svg viewBox="0 0 100 100" class="w-40 h-40">
+                <!-- Segment: En attente -->
+                <circle cx="50" cy="50" r="40" fill="transparent" stroke="#FBBF24" stroke-width="15" stroke-dasharray="36 100" stroke-dashoffset="0"></circle>
+                <!-- Segment: Acceptées -->
+                <circle cx="50" cy="50" r="40" fill="transparent" stroke="#10B981" stroke-width="15" stroke-dasharray="40 100" stroke-dashoffset="-36"></circle>
+                <!-- Segment: Refusées -->
+                <circle cx="50" cy="50" r="40" fill="transparent" stroke="#EF4444" stroke-width="15" stroke-dasharray="15 100" stroke-dashoffset="-76"></circle>
+                <!-- Segment: Annulées -->
+                <circle cx="50" cy="50" r="40" fill="transparent" stroke="#9CA3AF" stroke-width="15" stroke-dasharray="9 100" stroke-dashoffset="-91"></circle>
+                <!-- Cercle central -->
+                <circle cx="50" cy="50" r="30" fill="white"></circle>
+              </svg>
+              <div class="absolute inset-0 flex items-center justify-center">
+                <div class="text-center">
+                  <div class="text-2xl font-bold text-[var(--text)]">{{ statsData.totalRequests }}</div>
+                  <div class="text-xs text-[var(--text-light)]">Total</div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Légende -->
+            <div class="donut-legend ml-6 space-y-2">
+              <div class="flex items-center">
+                <div class="w-3 h-3 rounded-full bg-amber-400 mr-2"></div>
+                <span class="text-sm text-[var(--text)]">En attente (36%)</span>
+              </div>
+              <div class="flex items-center">
+                <div class="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
+                <span class="text-sm text-[var(--text)]">Acceptées (40%)</span>
+              </div>
+              <div class="flex items-center">
+                <div class="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
+                <span class="text-sm text-[var(--text)]">Refusées (15%)</span>
+              </div>
+              <div class="flex items-center">
+                <div class="w-3 h-3 rounded-full bg-gray-400 mr-2"></div>
+                <span class="text-sm text-[var(--text)]">Annulées (9%)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Tableau des performances par logement -->
+    <div class="property-stats-table mt-8">
+      <h3 class="text-lg font-semibold text-[var(--text)] mb-4">Performance par logement</h3>
+      <div class="bg-white border border-[var(--border)] rounded-lg overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-[var(--border)]">
+            <thead>
+              <tr class="bg-gray-50">
+                <th class="px-6 py-3 text-left text-xs font-medium text-[var(--text-light)] uppercase tracking-wider">Logement</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-[var(--text-light)] uppercase tracking-wider">Visites</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-[var(--text-light)] uppercase tracking-wider">Demandes</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-[var(--text-light)] uppercase tracking-wider">Favoris</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-[var(--text-light)] uppercase tracking-wider">Taux de conversion</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-[var(--text-light)] uppercase tracking-wider">Statut</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-[var(--border)]">
+              <tr *ngFor="let property of statsData.propertiesStats" class="hover:bg-gray-50">
+                <td class="px-6 py-4">
+                  <div class="flex items-center">
+                    <img [src]="property.photoUrl" alt="Logement" class="h-10 w-10 rounded object-cover mr-3">
+                    <div>
+                      <div class="font-medium text-[var(--text)]">{{ property.title }}</div>
+                      <div class="text-xs text-[var(--text-light)]">{{ property.address }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-sm text-[var(--text)]">{{ property.views }}</td>
+                <td class="px-6 py-4 text-sm text-[var(--text)]">{{ property.requests }}</td>
+                <td class="px-6 py-4 text-sm text-[var(--text)]">{{ property.favorites }}</td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center">
+                    <div class="mr-2 w-16 bg-gray-200 rounded-full h-2.5">
+                      <div class="bg-blue-600 h-2.5 rounded-full" [style.width.%]="property.conversionRate"></div>
+                    </div>
+                    <span class="text-sm text-[var(--text)]">{{ property.conversionRate }}%</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <span class="px-2 py-1 text-xs font-medium rounded-full"
+                    [class.bg-green-100]="property.status === 'available'"
+                    [class.text-green-800]="property.status === 'available'"
+                    [class.bg-amber-100]="property.status === 'reserved'"
+                    [class.text-amber-800]="property.status === 'reserved'"
+                    [class.bg-gray-100]="property.status === 'unavailable'"
+                    [class.text-gray-800]="property.status === 'unavailable'"
+                  >
+                    {{ getStatusLabel(property.status) }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Conseils d'amélioration -->
+    <div class="improvement-tips mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+      <h3 class="flex items-center text-lg font-semibold text-[var(--text)] mb-3">
+        <i class="fas fa-lightbulb text-amber-500 mr-2"></i> Améliorez vos performances
+      </h3>
+      <p class="text-sm text-[var(--text-light)] mb-4">Basé sur vos statistiques actuelles, voici quelques conseils :</p>
+      <ul class="list-disc list-inside space-y-2 text-sm text-[var(--text)]">
+        <li>Ajoutez plus de photos de qualité pour augmenter l'attrait de vos annonces</li>
+        <li>Complétez les descriptions de vos logements avec plus de détails</li>
+        <li>Répondez plus rapidement aux demandes pour améliorer votre taux de conversion</li>
+        <li>Envisagez de passer à une offre premium pour augmenter la visibilité de vos annonces</li>
+      </ul>
+    </div>
+  </div>
+</div>

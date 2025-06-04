@@ -1,0 +1,118 @@
+<!-- KRILI-frontend\src\app\proprietaire\logements\logements.component.html -->
+<div class="logements-page-container p-4 md:p-6 lg:p-8" (click)="closeAllDropdowns()">
+  <div class="page-header">
+    <h1 class="text-2xl md:text-3xl font-bold" style="color: var(--text);">Mes Logements</h1>
+    <p class="text-sm md:text-base" style="color: var(--text-light);">Gérez, modifiez ou ajoutez de nouvelles annonces de logement.</p>
+  </div>
+
+  <div class="actions-bar">
+    <div class="filters">
+      <span class="text-sm" style="color: var(--text-light);">Filtres (bientôt)</span>
+    </div>
+    <a routerLink="/proprietaire/logements/nouveau" class="btn btn-accent">
+      <i class="fas fa-plus mr-2"></i>Publier un nouveau logement
+    </a>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-indicator">
+    <svg class="loading-spinner" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
+    <p>Chargement de vos logements...</p>
+  </div>
+
+  <div *ngIf="!isLoading && errorMessage" class="alert alert-danger">
+    <i class="fas fa-exclamation-triangle mr-2"></i> {{ errorMessage }}
+    <button (click)="loadLogements()" class="btn-retry ml-4">Réessayer</button>
+  </div>
+
+  <div *ngIf="!isLoading && !errorMessage && logements.length === 0" class="empty-state">
+    <i class="fas fa-house-damage"></i>
+    <p>Vous n'avez pas encore de logements enregistrés.</p>
+    <a routerLink="/proprietaire/logements/nouveau" class="btn btn-accent mt-4">Ajouter votre premier logement</a>
+  </div>
+
+  <div *ngIf="!isLoading && !errorMessage && logements.length > 0" class="logements-grid">
+    <div *ngFor="let logement of logements" class="logement-card card">
+      <div class="relative">
+        <a [routerLink]="['/logement', logement.id]" target="_blank" title="Voir l'annonce publiquement">
+          <img [src]="getImageUrl(logement.photos?.[0])" [alt]="logement.adresseLigne1 || 'Logement'" class="logement-card-image">
+        </a>
+        <span class="status-badge-overlay" [ngClass]="getStatutClass(logement.statut)">
+          {{ getStatutLibelle(logement.statut) }}
+        </span>
+        <span *ngIf="logement.niveauPremium && logement.niveauPremium !== 'STANDARD'" class="premium-indicator-badge">
+          <i class="fas fa-crown mr-1"></i>{{ logement.niveauPremium }}
+        </span>
+      </div>
+
+      <div class="logement-card-content">
+        <h3 class="logement-card-title" [title]="logement.type + ' - ' + (logement.adresseLigne1 || '')">
+            {{ logement.type || 'Type inconnu' }}
+            <span *ngIf="logement.adresseLigne1 && logement.adresseLigne1.split(',')[0] && logement.adresseLigne1.split(',')[0].trim() !== ''"> - {{ logement.adresseLigne1.split(',')[0] }}</span>
+        </h3>
+        <p class="logement-card-address" [title]="logement.adresseLigne1 || ''">
+          {{ logement.adresseLigne1 || 'Adresse non spécifiée' }}
+        </p>
+
+        <div class="flex flex-wrap gap-1 my-2 min-h-[20px]" *ngIf="logement.displayBadges && logement.displayBadges.length > 0">
+          <span *ngFor="let badgeKey of logement.displayBadges | slice:0:2" class="dynamic-badge-item" [ngClass]="getBadgeSpecificClass(badgeKey)">
+            <i [ngClass]="getBadgeIcon(badgeKey)" class="mr-1 text-xs"></i>{{ getBadgeText(badgeKey) }}
+          </span>
+          <span *ngIf="logement.displayBadges && logement.displayBadges.length > 2" class="dynamic-badge-item badge-style-default">...</span>
+        </div>
+        <div *ngIf="(!logement.displayBadges || logement.displayBadges.length === 0) && (logement.equipements && logement.equipements.length > 0)" class="flex flex-wrap gap-1 my-2 min-h-[20px]">
+            <span *ngFor="let equip of logement.equipements | slice:0:2" class="dynamic-badge-item badge-style-default">
+                <i class="fas fa-check text-xs mr-1"></i>{{ equip }}
+            </span>
+            <span *ngIf="logement.equipements.length > 2" class="dynamic-badge-item badge-style-default">...</span>
+        </div>
+
+        <div class="logement-card-price">
+          {{ logement.prix | currency:'MAD':'symbol':'1.0-0' }} / mois
+        </div>
+        <p class="text-xs" style="color: var(--text-light);">
+            Disponible le: {{ logement.dateDisponibilite | date:'dd/MM/yyyy' }}
+        </p>
+        <div *ngIf="logement.actionError" class="text-xs text-red-500 dark:text-red-400 mt-1 py-1 px-2 bg-red-50 dark:bg-red-900/30 rounded">
+            <i class="fas fa-exclamation-circle mr-1"></i> {{logement.actionError}}
+        </div>
+      </div>
+
+      <div class="logement-card-actions">
+        <button (click)="editLogement(logement.id)" class="action-btn edit-btn" title="Modifier le logement">
+          <i class="fas fa-edit mr-1"></i> Modifier
+        </button>
+        <div class="relative inline-block">
+          <button (click)="toggleDropdown(logement.id!, $event)" class="action-btn more-actions-btn" [disabled]="logement.isChangingState || logement.isDeleting" title="Plus d'actions">
+            <i *ngIf="!logement.isChangingState && !logement.isDeleting" class="fas fa-ellipsis-v"></i>
+            <svg *ngIf="logement.isChangingState || logement.isDeleting" class="animate-spin h-4 w-4 text-inherit" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+          </button>
+          <div *ngIf="activeDropdownLogementId === logement.id" class="dropdown-menu">
+            <a (click)="changeLogementStatut(logement.id, 'publier')" class="dropdown-item" *ngIf="logement.statut === 'BROUILLON' || logement.statut === 'ARCHIVEE'">
+              <i class="fas fa-eye dropdown-icon"></i> Publier
+            </a>
+            <a (click)="changeLogementStatut(logement.id, 'passerEnBrouillon')" class="dropdown-item" *ngIf="logement.statut === 'ACTIVE'">
+              <i class="fas fa-pencil-ruler dropdown-icon"></i> Passer en Brouillon
+            </a>
+            <a (click)="changeLogementStatut(logement.id, 'archiver')" class="dropdown-item" *ngIf="logement.statut !== 'ARCHIVEE'">
+              <i class="fas fa-archive dropdown-icon"></i> Archiver
+            </a>
+            <a (click)="changeLogementStatut(logement.id, 'remettreEnLigne')" class="dropdown-item" *ngIf="logement.statut === 'ARCHIVEE' || logement.statut === 'LOUEE' || logement.statut === 'RESERVEE'">
+              <i class="fas fa-undo dropdown-icon"></i> Remettre en Ligne
+            </a>
+            <hr class="dropdown-divider">
+            <a (click)="changeLogementStatut(logement.id, 'reserver')" class="dropdown-item" *ngIf="logement.statut === 'ACTIVE'">
+              <i class="fas fa-calendar-plus dropdown-icon"></i> Marquer Réservé
+            </a>
+            <a (click)="changeLogementStatut(logement.id, 'confirmerLocation')" class="dropdown-item" *ngIf="logement.statut === 'RESERVEE'">
+              <i class="fas fa-key dropdown-icon"></i> Marquer Loué
+            </a>
+            <hr class="dropdown-divider">
+            <a (click)="deleteLogement(logement.id)" class="dropdown-item danger-item">
+              <i class="fas fa-trash-alt dropdown-icon"></i> Supprimer
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

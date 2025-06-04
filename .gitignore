@@ -1,0 +1,42 @@
+# IntelliJ IDEA
+.idea/
+
+# Maven
+target/
+*.class
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Angular
+dist/
+
+# IDE
+.vscode/
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
+
+# Images
+krili-images/
+
+# OS files
+Thumbs.db
+
+# Environment files
+.env
+# Ignorer tous les fichiers d’environnement dotenv (sauf exemple)
+.env.*
+!.env.example
+
+# Rapports de couverture
+coverage/
+
+# Fichiers temporaires
+*.tmp
